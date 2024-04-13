@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Page</title>
+    <link rel="stylesheet" href="sectionDetails_CSS.css">
+    <style>
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        .user-info p {
+            margin-right: 20px;
+        }
+        .join-section button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+        .join-section input[type=text] {
+            padding: 10px;
+        }
+        .group-section {
+            width: 40%;
+            margin-right: 20px;
+            background-color: #f2f2f2;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-y: auto;
+        }
+        .group-section h2 {
+            margin-bottom: 10px;
+        }
+        .group-list {
+            list-style: none;
+            padding: 0;
+        }
+        .group-list li {
+            margin-bottom: 10px;
+        }
+        .group-list a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        .upcoming-quizzes {
+            width: 60%;
+            background-color: #f2f2f2;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-y: auto;
+        }
+        .upcoming-quizzes h2 {
+            margin-bottom: 10px;
+        }
+        .quiz-list {
+            list-style: none;
+            padding: 0;
+        }
+        .quiz-list .quiz-details {
+            margin-bottom: 10px;
+        }
+        .quiz-list a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        .quiz-details p {
+            margin: 0;
+            font-size: 12px;
+        }
+        .add-quiz-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="user-info">
+            <h2>Group Name: <%= gc %></h2> <!-- Use dynamic quiz name variable -->
+           
+        </div>
+        <form action="/create_quiz" method="post"> <!-- Form for adding a new quiz -->
+            <input type="text" style="display: none;" name="gc" value=<%= gc %>>
+            <div class="join-section">
+                <button class="add-quiz-button" type="submit">Add a New Quiz</button> <!-- Added Add a New Quiz button -->
+            </div>
+        </form>
+        
+    </header>
+
+    <main>
+        <div class="group-section">
+            <h2>Added Students</h2> <!-- Changed from My Groups -->
+            <ul class="group-list">
+                <% students.forEach(student => { %>
+                    <li>
+                        <%= student.name %> - <%= student.rollNo %> <!-- Assuming student object has name and registrationNumber properties -->
+                    </li>
+                <% }); %>
+            </ul>
+        </div>
+
+        <div class="upcoming-quizzes">
+            <h2>All Quizzes</h2> <!-- Changed from Upcoming Quizzes -->
+            <div class="quiz-list">
+                <% quizzes.forEach(quiz => { %>
+                    <div class="quiz-details">
+                        <a href="/quizzes/<%= quiz.id %>">
+                            <p><strong>Name:</strong> <%= quiz.title %> | <strong>Start Time:</strong> <%= quiz.startDate%> | <strong>End Time:</strong> <%= quiz.endDate %> | <strong>Duration:</strong> <%= quiz.time %> minutes</p>
+                        </a>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        
+
+    </script>
+</body>
+</html>

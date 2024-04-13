@@ -1,0 +1,152 @@
+<!-- create_quiz.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin-top: 0;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+        }
+        select, input[type="text"], button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin-top: 5px;
+        }
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="%23828282" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="24px" height="24px"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"></path></svg>');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 30px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #ccc;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <h1>Create Quiz</h1>
+        <form action="/add_quiz" method="post">
+            <p id="id1" name="id1">Group Code: <%= gc %></p>
+            <input type="text" style="display: none;" name="gc" value=<%= gc %>>
+
+            <div class="form-group">
+                <label for="title">Quiz Title:</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+   
+    <div class="form-group">
+        <label for="startTime">Start Time:</label>
+        <input type="datetime-local" id="startTime" name="startTime" required>
+    </div>
+    <div class="form-group">
+        <label for="endTime">End Time:</label>
+        <input type="datetime-local" id="endTime" name="endTime" required>
+    </div>
+            
+           
+            <div class="form-group">
+                <label for="duration">Quiz Duration (in minutes):</label>
+                <input type="number" id="duration" name="duration" min="1" required>
+            </div>
+            <hr>
+            <h2>Add Questions</h2>
+            <div id="questions">
+                <!-- Questions will be dynamically added here -->
+            </div>
+            <button type="button" onclick="addQuestion()">Add Question</button>
+            <button type="submit">Create Quiz</button>
+        </form>
+    </div>
+
+    <script>
+        function addQuestion() {
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'question';
+            questionDiv.innerHTML = `
+                <div class="form-group">
+                    <label for="question">Question:</label>
+                    <input type="text" name="question[]" required>
+                </div>
+                <div class="form-group">
+                    <label for="option1">Option 1:</label>
+                    <input type="text" name="options[]" required>
+                </div>
+                <div class="form-group">
+                    <label for="option2">Option 2:</label>
+                    <input type="text" name="options[]" required>
+                </div>
+                <div class="form-group">
+                    <label for="option3">Option 3:</label>
+                    <input type="text" name="options[]" required>
+                </div>
+                <div class="form-group">
+                    <label for="option4">Option 4:</label>
+                    <input type="text" name="options[]" required>
+                </div>
+                <div class="form-group">
+                    <label for="correctOption">Correct Option:</label>
+                    <select name="correctOption">
+                        <option value="0">Option 1</option>
+                        <option value="1">Option 2</option>
+                        <option value="2">Option 3</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="marks">Marks:</label>
+                    <input type="number" name="marks[]" min="1" required>
+                </div>
+                <button type="button" onclick="removeQuestion(this.parentNode)">Remove Question</button>
+                <hr>
+            `;
+            document.getElementById('questions').appendChild(questionDiv);
+        }
+
+        function removeQuestion(questionDiv) {
+            questionDiv.parentNode.removeChild(questionDiv);
+        }
+    </script>
+</body>
+</html>

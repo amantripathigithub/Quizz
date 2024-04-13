@@ -3,11 +3,14 @@ const Schema = mongoose.Schema;
 
 let faculty = new Schema({
     name: { type: String, required: true },
-    emailid: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    permissions: [{
+
+    
+    groups: [{
       
-      groupcode: { type: String, required: true }
+      groupcode: { type: String, required: true },
+
     }]
 
     

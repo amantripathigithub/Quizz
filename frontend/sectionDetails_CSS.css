@@ -1,0 +1,88 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.user-info {
+    display: flex;
+}
+
+.user-info p {
+    margin-right: 20px;
+}
+
+.join-section input[type="text"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.join-section button {
+    padding: 10px 20px;
+    background-color: #555;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+main {
+    display: flex;
+    justify-content: space-between;
+    max-width: 960px;
+    margin: 10px auto;
+}
+
+.group-section,
+.upcoming-quizzes {
+    width: 45%;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    height: 400px; /* Increased height */
+}
+
+.group-section h2,
+.upcoming-quizzes h2 {
+    padding: 20px;
+    margin: 0;
+    background-color: #333;
+    color: #fff;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.group-section ul,
+.upcoming-quizzes ul {
+    list-style: none;
+    padding: 0;
+    margin: 0; /* Remove default margin */
+}
+
+.group-section li,
+.upcoming-quizzes li {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.group-section li:last-child,
+.upcoming-quizzes li:last-child {
+    border-bottom: none;
+}
+
+.group-section p,
+.upcoming-quizzes p {
+    margin: 0;
+}

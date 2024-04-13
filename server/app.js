@@ -35,7 +35,12 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 const faculty = require('./model/faculty');
+const Quizz = require('./model/quizz');
+const Group = require('./model/group');
 
+const Student = require('./model/student');
+const { time } = require('console');
+const { title } = require('process');
 
 
 // const cr  = require('./model/cr');
@@ -46,21 +51,82 @@ const faculty = require('./model/faculty');
 
 app.get('/faculty_login',(req,res) =>{
 
-    app.use(express.static("../client"));
-   return  res.render(path.join(__dirname, "../client", "/faculty_login.ejs"));
+    app.use(express.static("../frontend"));
+   return  res.render(path.join(__dirname, "../frontend", "/faculty_login.ejs"));
+
+})
+
+
+app.get('/faculty_view_group',(req,res) =>{
+
+    app.use(express.static("../frontend"));
+   return  res.render(path.join(__dirname, "../frontend", "/faculty_login.ejs"));
 
 })
 
 app.get('/faculty_home',(req,res) =>{
 
-    app.use(express.static("../client"));
-   return  res.render(path.join(__dirname, "../client", "/faculty_home.ejs"));
+    app.use(express.static("../frontend"));
+   return  res.render(path.join(__dirname, "../frontend", "/faculty_home.ejs"));
 
 })
 
-app.post('/faculty_login',(req,res)=>{
-    
-})
+
+app.post('/faculty_login', async (req, res) => {
+    const email = req.body.email;
+    const pass = req.body.password;
+
+
+    try {
+        const userExist = await faculty.findOne({ email: email, password: pass });
+        
+        if (userExist) {
+            const fname = userExist.name;
+            const email = userExist.email;
+
+            const gc = userExist.groups;
+            const groupCodes = gc.map(item => item.groupcode);
+
+            // Fetch quizzes based on group codes
+            const quizzes = await Quizz.aggregate([
+                {
+                    $match: {
+                        "groupcode": { $in: groupCodes }
+                    }
+                }
+            ]);
+
+
+
+            let groupsss;
+            await Group.find({}, 'groupCode')
+            .then(groups => {
+                // Extract group codes from the documents
+                groupsss = groups.map(group => group.groupCode);
+                
+                // Use the groupCodes array as needed
+                //console.log("Group codes:", groupCodes);
+            })
+            .catch(error => {
+                // Handle any errors
+                console.error("Error fetching group codes:", error);
+            });
+
+            console.log("grp:", groupsss);
+            app.use(express.static("../frontend"));
+            return res.render(path.join(__dirname, "../frontend", "/faculty_home.ejs"), { name: fname, email: email, gc: groupCodes, quizzes: quizzes , allGroups:groupsss });
+        } else {
+            app.use(express.static("../frontend"));
+            return res.render(path.join(__dirname, "../frontend", "/faculty_register.ejs"));
+        }
+    } catch (err) {
+        
+        console.log(err);
+        // Handle error
+        res.status(500).send("Internal Server Error");
+    }
+});
+
 
 
 app.post('/faculty_home',(req,res)=>{
@@ -68,343 +134,329 @@ app.post('/faculty_home',(req,res)=>{
 })
 
 
-// app.get('/student_login',(req,res) =>{
-
-//     app.use(express.static("../client"));
-//    return  res.render(path.join(__dirname, "../client", "/student_login.ejs"));
-
-// })
 
 
-// app.post('/student_login',(req,res) =>{
-//     const id = req.body.sid;
-//     const pass = req.body.spassword;
+app.post('/faculty_view_group',async (req,res)=>{
+    const selectedGroup = req.body.selectedGroup;
 
-//     //console.log(id+" "+pass);
+    console.log(selectedGroup);
+
+    const quizzes = await Quizz.aggregate([
+        {
+            $match: {
+                "groupcode": {  selectedGroup }
+            }
+        }
+    ]);
+
+
+
+
+    console.log(quizzes);
+
+
+    const query = { groupCodes: { $in: [selectedGroup] } };
+
+    let students;
+
+    try {
+        // Execute the query using await
+         students = await Student.find(query);
+        
+        // Handle the results
+        console.log("Students with group code 'temp':", students);
+        // You can do whatever you want with the fetched students here
+    } catch (error) {
+        // Handle any errors
+        console.error("Error fetching students:", error);
+    }
+
+
+    app.use(express.static("../frontend"));
+    return  res.render(path.join(__dirname, "../frontend", "/view_group.ejs"),{gc:selectedGroup,quizzes:quizzes,students:students});
+
+
+})
+
+
+
+app.get('/faculty_register',(req,res) =>{
+
+    app.use(express.static("../frontend"));
+   return  res.render(path.join(__dirname, "../frontend", "/faculty_register.ejs"));
+
+})
+
+app.post('/create_quiz',async(req,res)=>{
+    
+    gc = req.body.gc;
+
+console.log(gc);
+
+    app.use(express.static("../frontend"));
+   return  res.render(path.join(__dirname, "../frontend", "/create_quiz.ejs"),{gc:gc});
+
+
+
+})
+
+app.post('/add_quiz',async(req,res)=>{
+    
+    gc = req.body.gc;
+
+  console.log(req.body);
+
+let title = req.body.title;
+let time = req.body.duration;
+let questions = req.body.question;
+let options = req.body.options;
+let correctOption = req.body.correctOption;
+let marks =req.body.marks;
+
+let start=req.body.startTime;
+let end =req.body.endTime;
+
+let sr = [{}]
+
+let q=[]
+for(var i=0,k=0;i<questions.length;i++){
+q.push({
+    question:questions[i],
+    options:[options[k],options[k+1],options[k+2],options[k+3]],
+    correctOption:correctOption[i],
+    marks:marks[i]
 
     
-//     cr.findOne({id:id,password:pass})
-//         .then(async (userExist) => {
-//             if (userExist){
+})
+k++;
+k++;
+k++;
+k++;
+
+}
+
+// groupcode:{type:String , required:true},
+
+//     title: { type: String, required: true },
+//     questions: [questionSchema], // Array of questions
+//     startDate: { type: Date, required: true },
+//     endDate: { type: Date, required: true },
+//     time: {type:Number , required :true},
+//     result:[stuResult],
+
+
+
+await  Quizz.create({groupcode:gc,title:title,questions:q,startDate:start,endDate:end,time:time,result:sr}).then(async(result)=>{
+
+
+    console.log("quizz created!!!!!!!!!");
+
+//     app.use(express.static("../frontend"));
+// return  res.render(path.join(__dirname, "../frontend", "faculty_login/.ejs"));
+}).catch(err=>{console.log("error in uploading")});
+
+
+
+
+
+
+//     app.use(express.static("../frontend"));
+//    return  res.render(path.join(__dirname, "../frontend", "/create_quiz.ejs"));
+
+
+})
+
+
+
+app.post('/faculty_register',async(req,res)=>{
+    fname = req.body.name;
+    email = req.body.email;
+    pass = req.body.password;
+
+    console.log(fname+email+pass);
+
+    gc=[{groupcode:"temp"}];
+
+    await  faculty.create({name:fname,email:email,password:pass,groups:gc}).then(async(result)=>{
+        app.use(express.static("../frontend"));
+   return  res.render(path.join(__dirname, "../frontend", "/faculty_login.ejs"));
+    }).catch(err=>{console.log(err)});
+
+
+
+
+})
+
+// add group by faculty
+
+app.post('/add_group',async(req,res)=>{
+    
+    let gn = req.body.groupName;
+    let em = req.body.email;
+    let groupCode= req.body.groupCode;
+
+    await  Group.create({name:gn,groupCode:groupCode}).then(async(result)=>{
+
+
+        // into faculty 
+
+        try {
+            // Find the faculty document by email and update it to add the new group code
+            const updatedFaculty = await faculty.findOneAndUpdate(
+                { email: em}, // Find faculty by email
+                { $addToSet: { groups: { groupcode: groupCode } } }, // Add group code to the groups array if it doesn't already exist
+                { new: true } // Return the updated document
+            );
+            
+            if (updatedFaculty) {
+            //whrgheer
+            
+            
+            const gc = updatedFaculty.groups;
+            const groupCodes = gc.map(item => item.groupcode);
+
+            // Fetch quizzes based on group codes
+            const quizzes = await Quizz.aggregate([
+                {
+                    $match: {
+                        "groupcode": { $in: groupCodes }
+                    }
+                }
+            ]);
+
+
+
+            let groupsss;
+            await Group.find({}, 'groupCode')
+            .then(groups => {
+                // Extract group codes from the documents
+                groupsss = groups.map(group => group.groupCode);
+                
+                // Use the groupCodes array as needed
+                //console.log("Group codes:", groupCodes);
+            })
+            .catch(error => {
+                // Handle any errors
+                console.error("Error fetching group codes:", error);
+            });
+
+            fname = updatedFaculty.name;
+            email = updatedFaculty.email;
+            
+
+            console.log("grp:", groupsss);
+            app.use(express.static("../frontend"));
+            return res.render(path.join(__dirname, "../frontend", "/faculty_home.ejs"), { name: fname, email: email, gc: groupCodes, quizzes: quizzes , allGroups:groupsss });
+        
+
+
+// sahbgeahr                
                
+console.log("Group code added successfully:", updatedFaculty);
+            } else {
+                console.log("Faculty not found with email:", email);
+            }
+        } catch (error) {
+            console.error("Error adding group code:", error);
+        }
 
-//                 request.find({course: userExist.course})
-//                 .then(async (requests) => {
-
-//                     requests= requests.filter(request => request['stat'] === false);
-
-
-
-
-
-//                     app.use(express.static("../client"));
-//                     return res.render(path.join(__dirname, "../client", "/cr_home.ejs"),{user:userExist,requests:requests});
-                    
-//                 }).catch(err => { console.log(err); });
-
-//             }else{
-//                 app.use(express.static("../client"));
-//    return  res.render(path.join(__dirname, "../client", "/cr_login_failed.ejs"));
-//             }
-
-
-//         }).catch(err => { console.log(err); });
+        app.use(express.static("../frontend"));
+   return  res.render(path.join(__dirname, "../frontend", "/faculty_login.ejs"));
+    }).catch(err=>{console.log(err)});
 
 
 
 
-
-// })
-
-// app.get('/student_signup',(req,res) =>{
-
-//     app.use(express.static("../client"));
-//    return  res.render(path.join(__dirname, "../client", "/student_signup.ejs"));
-
-// })
+})
 
 
+// student work
 
-// app.post('/student_signup',async(req,res)=>{
-//     sname =req.body.name;
-//     sid = req.body.id;
-//     spassword = req.body.password;
-//     scourse = req.body.course;
 
-//     await  request.create({course:scourse,id:sid,name:sname,password:spassword,stat:false}).then(async(result)=>{
-//         app.use(express.static("../client"));
-//    return  res.render(path.join(__dirname, "../client", "/student_signup_waiting.ejs"));
-//     }).catch(err=>{console.log("error in uploading")});
-// })
+app.get('/student_register',(req,res) =>{
 
-// app.post('/cr_login',(req,res) =>{
-//     const id = req.body.crid;
-//     const pass = req.body.crpassword;
+    app.use(express.static("../frontend"));
+   return  res.render(path.join(__dirname, "../frontend", "/student_register.ejs"));
 
-//     //console.log(id+" "+pass);
+})
 
+app.post('/student_register',async(req,res)=>{
     
-//     cr.findOne({id:id,password:pass})
-//         .then(async (userExist) => {
-//             if (userExist){
-               
+    let email = req.body.email;
 
-//                 request.find({course: userExist.course})
-//                 .then(async (requests) => {
+    let pass = req.body.password;
 
-//                     requests= requests.filter(request => request['stat'] === false);
+    let roll = req.body.roll;
 
+    let name = req.body.name;
 
+    let gc=[];
 
+    await  Student.create({name:name,email:email,rollNo:roll,password:pass,groupCodes:gc}).then(async(result)=>{
+        app.use(express.static("../frontend"));
+   return  res.render(path.join(__dirname, "../frontend", "/student_login.ejs"));
+    }).catch(err=>{console.log(err)});
 
-
-//                     app.use(express.static("../client"));
-//                     return res.render(path.join(__dirname, "../client", "/cr_home.ejs"),{user:userExist,requests:requests});
-                    
-//                 }).catch(err => { console.log(err); });
-
-//             }else{
-//                 app.use(express.static("../client"));
-//    return  res.render(path.join(__dirname, "../client", "/cr_login_failed.ejs"));
-//             }
-
-
-//         }).catch(err => { console.log(err); });
+   
 
 
 
+})
 
 
-// })
 
-// app.post('/add_new_sem',async(req,res)=>{
+app.get('/student_login',(req,res) =>{
 
-//     var all_sem=[];
-//     var found = false;
-// var c = req.body.course;
+    app.use(express.static("../frontend"));
+   return  res.render(path.join(__dirname, "../frontend", "/student_login.ejs"));
 
-// console.log(c);
-// var userExist=undefined
+})
 
-//   await   syllabus.findOne({course:c})
-//         .then(async (userExist) => {
-//             if (userExist){
-//                 console.log(userExist)
-
-//                 all_sem = userExist.semesters;
-//                 found=true;
-//             }else{
-//                 console.log("not exist")
-//             }
-//         }).catch(err => { console.log(err); });
-
-//         //console.log(userExist);
-
-//         var code = req.body.sub_code;
-//     var name = req.body.sub_name;
-
+app.post('/student_login',async(req,res)=>{
     
-
-//    var codes = code.split(",");
-//    var names=name.split(",");
-
-
-//     if (codes.length > 0 && codes[0] === "") {
-//         codes.shift();
-//       }
-
-//       if (names.length > 0 && names[0] === "") {
-//         names.shift();
-//       }
-
-//       var new_subjects =[];
-
-//       var i = 0
-//       while(i<names.length){
-//         new_subjects.push({subject_code: codes[i] , subject_name : names[i]});
-//         i++;
-//       }
-
-//       var current_sem = {
-//         subjects: new_subjects
-//       };
-    
-// if(found===true){
-    
-
-    
-//     var updated_semesters = all_sem;
-//     updated_semesters.push(current_sem);
-
-//    await syllabus.updateOne(
-//         { course: c  },
-//     { $set: { semesters: updated_semesters } }
-//     )
-
-
-// }else{
-
-  
-
-//     const temporarySyllabusData = {
-//         course: c,
-//         semesters: current_sem
-//       };
-//    await  syllabus.create(temporarySyllabusData).then(async(result)=>{
-
-//     }).catch(err=>{console.log("error in uploading")});
-// }
-
-    
-
-// app.use(express.static("../client"));
-// return  res.render(path.join(__dirname, "../client", "/cr_login.ejs"));
-
-
-
-
-
-
-// })
-
-// app.post('/accept_reject_requests',async(req,res)=>{
-
-//     acc  = req.body.ids_acc;
-
-//    // console.log(acc);
-//     acc_req = acc.split(",");
-
-// // Remove the first empty string element if the input string starts with a comma
-// if (acc_req.length > 0 && acc_req[0] === "") {
-//   acc_req.shift();
-// }
-
-// console.log(acc_req);
-
-// rej = req.body.ids_rej;
-
-// rej_req = rej.split(",");
-
-// // Remove the first empty string element if the input string starts with a comma
-// if (rej_req.length > 0 && rej_req[0] === "") {
-//   rej_req.shift();
-// }
-
-// console.log(rej_req);
-
-
-// var i=0;
-
-// const result_rej = await request.deleteMany({ _id: { $in: rej_req } });
-
-// const result_acc = await request.updateMany(
-//     { _id: { $in: acc_req } },
-//     { $set: { stat: true } } // Replace 'fieldName' with the field you want to update
-// );
-
-
-
-
-// app.use(express.static("../client"));
-// return  res.render(path.join(__dirname, "../client", "/cr_login.ejs"));
-
-
-// })
-
-
-// // faculty part 
-
-
-// app.get('/faculty_login',(req,res) =>{
-
-//     app.use(express.static("../client"));
-//    return  res.render(path.join(__dirname, "../client", "/faculty_login.ejs"));
-
-// })
-
-// app.post('/faculty_login',(req,res) =>{
-//     const id = req.body.crid;
-//     const pass = req.body.crpassword;
-
-//     //console.log(id+" "+pass);
-
-    
-//     faculty.findOne({id:id,password:pass})
-//         .then(async (userExist) => {
-//             if (userExist){
-               
-
-//                 const courses = userExist.permissions.map(permission => `${permission.course} ${permission.semester} ${permission.subcode}`);
-
-
-               
-//                     app.use(express.static("../client"));
-//                     return res.render(path.join(__dirname, "../client", "/faculty_home.ejs"),{user:userExist,courses:courses});
-                    
-               
-
-
-
-//             }else{
-//                 app.use(express.static("../client"));
-//    return  res.render(path.join(__dirname, "../client", "/cr_login_failed.ejs"));
-//             }
-
-
-//         }).catch(err => { console.log(err); });
-
-
-
-
-
-// })
-
-
-
-// app.post('/create_quiz',async(req,res) =>{
-    
-
-// console.log(req.body);
-
-// course = req.body.course;
-// duration = req.body.duration;
-// questions = req.body.question;
-// options = req.body.options;
-// correctOption = req.body.correctOption;
-// marks =req.body.marks;
-// facultyId = req.body.id;
-// start=req.body.startTime;
-// end =req.body.endTime;
-
-// words = course.split(" ");
-// sr = [{}]
-// console.log(words);
-// q=[]
-// for(var i=0,k=0;i<questions.length;i++){
-// q.push({
-//     question:questions[i],
-//     options:[options[k],options[k+1],options[k+2]],
-//     correctOption:correctOption[i],
-//     marks:marks[i]
-
-    
-// })
-// k++;
-// k++;
-// k++;
-
-// }
-
-// await  Quiz.create({facultyId:facultyId,course:words[0],semester:words[1],subject:words[2],duration:duration,questions:q,startTime:start,endTime:end,studentResult:sr}).then(async(result)=>{
-//     app.use(express.static("../client"));
-// return  res.render(path.join(__dirname, "../client", "faculty_login/.ejs"));
-// }).catch(err=>{console.log("error in uploading")});
-
-
-
-
-// })
-
+    let email = req.body.email;
+
+    let pass = req.body.password;
+
+
+    try {
+        const userExist = await Student.findOne({ email: email, password: pass });
+        
+        if (userExist) {
+            const sname = userExist.name;
+            const email = userExist.email;
+            const roll = userExist.rollNo;
+            const gc = userExist.groupCodes;
+            
+
+            // Fetch quizzes based on group codes
+            const quizzes = await Quizz.aggregate([
+                {
+                    $match: {
+                        "groupcode": { $in: gc }
+                    }
+                }
+            ]);
+
+
+            console.log("Quizzes:", quizzes);
+            app.use(express.static("../frontend"));
+            return res.render(path.join(__dirname, "../frontend", "/student_home.ejs"), { name: sname, email: email,roll:roll, gc: gc, quizzes: quizzes });
+        } else {
+            app.use(express.static("../frontend"));
+            return res.render(path.join(__dirname, "../frontend", "/student_register.ejs"));
+        }
+    } catch (err) {
+        
+        console.log(err);
+        // Handle error
+        res.status(500).send("Internal Server Error");
+    }
+
+
+
+
+})
 
 app.listen(PORT, () => {
     console.log("Server listening on port " + `${PORT}`);
