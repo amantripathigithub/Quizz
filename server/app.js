@@ -51,12 +51,21 @@ app.get('/faculty_login',(req,res) =>{
 
 })
 
+app.get('/faculty_home',(req,res) =>{
 
+    app.use(express.static("../client"));
+   return  res.render(path.join(__dirname, "../client", "/faculty_home.ejs"));
+
+})
 
 app.post('/faculty_login',(req,res)=>{
     
 })
 
+
+app.post('/faculty_home',(req,res)=>{
+    
+})
 
 
 // app.get('/student_login',(req,res) =>{
