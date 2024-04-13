@@ -37,10 +37,12 @@ app.use(bodyParser.json());
 const faculty = require('./model/faculty');
 
 
+
 // const cr  = require('./model/cr');
 // const request = require('./model/request');
 // const syllabus = require('./model/syllabus');
 // const Quiz  = require('./model/quiz');
+
 
 app.get('/faculty_login',(req,res) =>{
 
@@ -48,6 +50,7 @@ app.get('/faculty_login',(req,res) =>{
    return  res.render(path.join(__dirname, "../client", "/faculty_login.ejs"));
 
 })
+
 
 
 app.post('/faculty_login',(req,res)=>{
