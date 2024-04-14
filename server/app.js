@@ -150,6 +150,7 @@ app.post('/faculty_home',(req,res)=>{
 
 app.post('/faculty_view_group',async (req,res)=>{
     const selectedGroup = req.body.selectedGroup;
+    let email = req.body.email
 
     console.log(selectedGroup);
 
@@ -164,10 +165,38 @@ app.post('/faculty_view_group',async (req,res)=>{
     let gn;
 
     Group.findOne({ groupCode: selectedGroup })
-    .then(group => {
+    .then(async group => {
         if (group) {
             gn=group.name;
             console.log('Found group:', group);
+
+
+
+            console.log(quizzes);
+
+
+            const query = { groupCodes: { $in: [selectedGroup] } };
+        
+            let students;
+        
+            try {
+                // Execute the query using await
+                 students = await Student.find(query);
+                
+                // Handle the results
+                console.log("Students with group code 'temp':", students);
+                // You can do whatever you want with the fetched students here
+            } catch (error) {
+                // Handle any errors
+                console.error("Error fetching students:", error);
+            }
+        
+        
+            app.use(express.static("../frontend"));
+            return  res.render(path.join(__dirname, "../frontend", "/view_group.ejs"),{email:email,gn:gn,gc:selectedGroup,quizzes:quizzes,students:students});
+        
+
+
         } else {
             console.log('Group not found');
         }
@@ -178,31 +207,10 @@ app.post('/faculty_view_group',async (req,res)=>{
 
 
 
-    console.log(quizzes);
-
-
-    const query = { groupCodes: { $in: [selectedGroup] } };
-
-    let students;
-
-    try {
-        // Execute the query using await
-         students = await Student.find(query);
-        
-        // Handle the results
-        console.log("Students with group code 'temp':", students);
-        // You can do whatever you want with the fetched students here
-    } catch (error) {
-        // Handle any errors
-        console.error("Error fetching students:", error);
-    }
-
-
-    app.use(express.static("../frontend"));
-    return  res.render(path.join(__dirname, "../frontend", "/view_group.ejs"),{gn:gn,gc:selectedGroup,quizzes:quizzes,students:students});
-
+   
 
 })
+
 
 
 
@@ -253,12 +261,13 @@ app.get('/faculty_register',(req,res) =>{
 
 app.post('/create_quiz',async(req,res)=>{
     
-    gc = req.body.gc;
+    let gc = req.body.gc;
+    let email = req.body.email
 
     console.log(gc);
 
     app.use(express.static("../frontend"));
-   return  res.render(path.join(__dirname, "../frontend", "/create_quiz.ejs"),{gc:gc});
+   return  res.render(path.join(__dirname, "../frontend", "/create_quiz.ejs"),{email: email,gc:gc});
 
 
 
@@ -267,6 +276,7 @@ app.post('/create_quiz',async(req,res)=>{
 app.post('/add_quiz',async(req,res)=>{
     
     gc = req.body.gc;
+    email = req.body.email
 
   console.log(req.body);
 
@@ -315,9 +325,74 @@ await  Quizz.create({groupcode:gc,title:title,questions:q,startDate:start,endDat
 
     console.log("quizz created!!!!!!!!!");
 
+
+     try {
+        const userExist = await faculty.findOne({ email: email });
+        
+        if (userExist) {
+            const fname = userExist.name;
+            const email = userExist.email;
+
+            const gc = userExist.groups;
+            console.log(gc)
+            const groupCodes = gc.map(item => item.groupcode);
+            // const groupnames = gc.map(item => item.name);
+            // console.log(groupnames)
+            console.log(groupCodes)
+            const groups_obj = await Group.aggregate([
+                {
+                    $match: {
+                        "groupCode" : { $in: groupCodes}
+                    }
+                }
+            ]);
+            //const groupnames = groups.map(item => item.name)
+            //console.log(groupnames)
+            // Fetch quizzes based on group codes
+            const quizzes = await Quizz.aggregate([
+                {
+                    $match: {
+                        "groupcode": { $in: groupCodes }
+                    }
+                }
+            ]);
+
+
+
+            let groupsss;
+            await Group.find({}, 'groupCode')
+            .then(groups => {
+                // Extract group codes from the documents
+                groupsss = groups.map(group => group.groupCode);
+                
+                // Use the groupCodes array as needed
+                //console.log("Group codes:", groupCodes);
+            })
+            .catch(error => {
+                // Handle any errors
+                console.error("Error fetching group codes:", error);
+            });
+
+            console.log("grp:", groupsss);
+            app.use(express.static("../frontend"));
+            return res.render(path.join(__dirname, "../frontend", "/faculty_home.ejs"), { name: fname, email: email, gc: groups_obj, quizzes: quizzes , allGroups:groupsss });
+        } else {
+            app.use(express.static("../frontend"));
+            return res.render(path.join(__dirname, "../frontend", "/faculty_register.ejs"));
+        }
+    } catch (err) {
+        
+        console.log(err);
+        // Handle error
+        res.status(500).send("Internal Server Error");
+    }
+    
+
+
 //     app.use(express.static("../frontend"));
 // return  res.render(path.join(__dirname, "../frontend", "faculty_login/.ejs"));
 }).catch(err=>{console.log("error in uploading")});
+
 
 
 
@@ -331,25 +406,40 @@ await  Quizz.create({groupcode:gc,title:title,questions:q,startDate:start,endDat
 })
 
 
+app.post('/faculty_register', async (req, res) => {
+    const fname = req.body.name;
+    const email = req.body.email;
+    const pass = req.body.password;
 
-app.post('/faculty_register',async(req,res)=>{
-    fname = req.body.name;
-    email = req.body.email;
-    pass = req.body.password;
+    console.log(fname);
+    console.log(email);
+    console.log(pass);
 
-    console.log(fname+email+pass);
+    try {
+        // Check if email is provided
+        if (!email) {
+            throw new Error('Email address is required.');
+        }
 
-    gc=[{groupcode:"temp"}];
+        // Check if email is unique
+        const existingFaculty = await faculty.findOne({ email: email });
+        if (existingFaculty) {
+            throw new Error('Email address already exists.');
+        }
 
-    await  faculty.create({name:fname,email:email,password:pass,groups:gc}).then(async(result)=>{
-        app.use(express.static("../frontend"));
-   return  res.render(path.join(__dirname, "../frontend", "/faculty_login.ejs"));
-    }).catch(err=>{console.log(err)});
+        // Create faculty document
+        //const gc = [{ groupcode: "temp" }];
+        await faculty.create({ name: fname, email: email, password: pass });
+
+        // Redirect or render success page
+        res.render(path.join(__dirname, "../frontend", "/faculty_login.ejs"));
+    } catch (error) {
+        console.error('Error registering faculty:', error.message);
+        res.status(400).send(error.message); // Send error message back to client
+    }
+});
 
 
-
-
-})
 
 // add group by faculty
 
@@ -786,6 +876,57 @@ app.post('/quiz_submit',async (req, res) => {
         console.error('Error updating quiz result:', error);
     }
 
+
+
+    try {
+        const userExist = await Student.findOne({ email: email});
+        
+        if (userExist) {
+            const sname = userExist.name;
+            const email = userExist.email;
+            const roll = userExist.rollNo;
+            const gc = userExist.groupCodes;
+let groups;
+
+            try {
+                // Find all groups where groupCode is in the groupCodesArray
+                groups = await Group.find({ groupCode: { $in: gc } });
+        
+                // Handle success
+                console.log('Groups:', groups);
+            } catch (err) {
+                // Handle error
+                console.error('Error:', err);
+            }
+        
+            
+
+            // Fetch quizzes based on group codes
+            const quizzes = await Quizz.aggregate([
+                {
+                    $match: {
+                        "groupcode": { $in: gc }
+                    }
+                }
+            ]);
+
+
+
+
+
+            console.log("Quizzes:", quizzes);
+            app.use(express.static("../frontend"));
+            return res.render(path.join(__dirname, "../frontend", "/student_home.ejs"), { name: sname, email: email,roll:roll, groups: groups, quizzes: quizzes });
+        } else {
+            app.use(express.static("../frontend"));
+            return res.render(path.join(__dirname, "../frontend", "/student_register.ejs"));
+        }
+    } catch (err) {
+        
+        console.log(err);
+        // Handle error
+        res.status(500).send("Internal Server Error");
+    }
 
 
     res.send('Form submitted successfully');

@@ -6,15 +6,62 @@
     <title>Student Page</title>
     <link rel="stylesheet" href="student_home.css">
     <style>
-        .upcoming-quizzes {
-            width: 60%; /* Increased width */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
         }
-        .group-section {
-            width: 39.5%; /* Increased width */
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .user-info {
+            text-align: left;
+        }
+        .user-info p {
+            margin: 0;
+            font-size: 16px;
+        }
+        main {
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .upcoming-quizzes {
+            width: 60%;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-right: 20px;
+        }
+        .upcoming-quizzes h2 {
+            margin-top: 0;
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .quiz-details {
+            cursor: pointer;
+            padding: 10px;
+            background-color: #f9f9f9;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .quiz-details:hover {
+            background-color: #e0e0e0;
         }
         .quiz-details p {
             margin: 0;
-            font-size: 8px; /* Smaller font size */
+            font-size: 14px;
+            color: #555;
         }
     </style>
 </head>
@@ -24,26 +71,23 @@
             <p>Group Name: <%= gn %></p>
             <p>Group Code: <%= gc %></p>
         </div>
-       
-        
     </header>
 
     <main>
-        
-        
-
         <div class="upcoming-quizzes">
             <h2>All Quizzes</h2>
             <div class="quiz-list">
-                <% quizzes.forEach(quiz => { %>
+                <% 
+                    quizzes.sort((a, b) => new Date(b.startDate) - new Date(a.startDate)).forEach(quiz => { 
+                %>
                     <div class="quiz-details" onclick="submitQuizForm('<%= quiz._id %>', '<%= email %>')">
                         <form action="/quiz_leaderboard" method="post" id="quizForm<%= quiz._id %>">
                             <input type="hidden" name="quizId" value="<%= quiz._id %>">
                             <input type="hidden" name="email" value="<%= email %>">
                             <p>
-                                <strong>Name:</strong> <%= quiz.title %> | 
-                                <strong>Start Time:</strong> <%= quiz.startDate %> | 
-                                <strong>End Time:</strong> <%= quiz.endDate %> | 
+                                <strong>Name:</strong> <%= quiz.title %> |
+                                <strong>Start Time:</strong> <%= quiz.startDate %> |
+                                <strong>End Time:</strong> <%= quiz.endDate %> |
                                 <strong>Duration:</strong> <%= quiz.time %> minutes
                             </p>
                         </form>
@@ -51,24 +95,17 @@
                 <% }); %>
             </div>
         </div>
-        
-        
     </main>
 
     <script>
-
-function submitQuizForm(quizId, email) {
-    const form = document.getElementById('quizForm' + quizId);
-    if (form) {
-        form.submit();
-    } else {
-        console.error('Form not found for quizId:', quizId);
-    }
-}
-
-
-
-
+        function submitQuizForm(quizId, email) {
+            const form = document.getElementById('quizForm' + quizId);
+            if (form) {
+                form.submit();
+            } else {
+                console.error('Form not found for quizId:', quizId);
+            }
+        }
     </script>
 </body>
 </html>

@@ -69,6 +69,7 @@
         
         <h1>Create Quiz</h1>
         <form action="/add_quiz" method="post">
+            <input type="text" style="display: none;" name="email" value=<%= email %>>
             <p id="id1" name="id1">Group Code: <%= gc %></p>
             <input type="text" style="display: none;" name="gc" value=<%= gc %>>
 
@@ -132,6 +133,7 @@
                         <option value="0">Option 1</option>
                         <option value="1">Option 2</option>
                         <option value="2">Option 3</option>
+                        <option value="3">Option 4</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -150,3 +152,4 @@
     </script>
 </body>
 </html>
+ 

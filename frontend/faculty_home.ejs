@@ -175,6 +175,7 @@
         <div class="section">
             <h2>Add New Group</h2>
             <form action="/faculty_view_group" method="post"> <!-- Wrap the select inside a form -->
+                <input type="text" style="display: none;" name="email" value=<%= email %>>
                 <select name="selectedGroup" class="group-list">
                     <% gc.forEach(function(group) { %>
                         <option value="<%= group.groupCode %>">

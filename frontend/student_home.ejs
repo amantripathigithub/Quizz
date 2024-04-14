@@ -155,7 +155,10 @@
         <div class="upcoming-quizzes">
             <h2>Upcoming Quizzes</h2>
             <div class="quiz-list">
-                <% quizzes.forEach(quiz => { %>
+                <% 
+                    // Sort quizzes based on start time in ascending order
+                    quizzes.sort((a, b) => new Date(a.startDate) - new Date(b.startDate)).forEach(quiz => { 
+                %>
                     <% if (new Date(quiz.endDate) > new Date() && quiz.result.every(result => result.email !== email)) { %>
                         <div class="quiz-details" onclick="submitQuizForm('<%= quiz._id %>')">
                             <form action="/quiz_interface" method="POST" id="quizForm<%= quiz._id %>">

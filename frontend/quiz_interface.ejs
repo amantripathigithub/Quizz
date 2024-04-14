@@ -55,9 +55,25 @@
             text-align: center;
         }
         #countdown {
-            font-size: 18px;
+            font-size: 24px;
             text-align: center;
-            color: #666;
+            color: #333;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .note-points {
+            text-align: center;
+            color: #f00;
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 16px;
+            background-color: #ffecec;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #f00;
         }
     </style>
 </head>
@@ -78,13 +94,13 @@
                 <input type="text" style="display: none;" name="email" value=<%= email %>>
                 <% if (currentTime < startTime) { %>
                     <p id="countdown"></p>
-
                 <% } else if (currentTime >= startTime && currentTime < endTime) { %>
                     <button class="start-button" id="startButton" type="submit">Start Quiz</button>
                 <% } else { %>
                     <p class="quiz-over">Quiz is Over</p>
                 <% } %>
             </form>
+            <p class="note-points">Do not switch tabs or close the window, as it will result in auto submission of your quiz without warning.</p>
         </div>
     </div>
 
