@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,6 +15,7 @@
             flex-direction: column;
             align-items: center;
         }
+
         header {
             background-color: #333;
             color: #fff;
@@ -21,6 +23,7 @@
             text-align: center;
             width: 100%;
         }
+
         .sections-container {
             display: flex;
             flex-direction: column;
@@ -28,20 +31,23 @@
             width: 80%;
             margin-top: 20px;
         }
+
         .section {
             background-color: #fff;
             border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
             padding: 20px;
             width: 100%;
         }
+
         h2 {
             color: #333;
             margin-bottom: 20px;
             border-bottom: 2px solid #ddd;
             padding-bottom: 10px;
         }
+
         .group-list {
             width: calc(50% - 10px);
             max-height: 200px;
@@ -51,31 +57,39 @@
             padding: 10px;
             margin-bottom: 20px;
         }
+
         .group-list p {
             margin: 5px 0;
             color: #666;
             cursor: pointer;
         }
+
         .group-list p:hover {
             background-color: #f0f0f0;
         }
+
         .group-list::-webkit-scrollbar {
             width: 5px;
         }
+
         .group-list::-webkit-scrollbar-thumb {
             background-color: #888;
             border-radius: 5px;
         }
+
         .group-list::-webkit-scrollbar-track {
             background-color: #f4f4f4;
             border-radius: 5px;
         }
+
         .group-list::-webkit-scrollbar-thumb:hover {
             background-color: #555;
         }
+
         form {
             margin-bottom: 20px;
         }
+
         input[type="text"] {
             width: calc(50% - 10px);
             padding: 8px;
@@ -84,6 +98,7 @@
             border-radius: 5px;
             box-sizing: border-box;
         }
+
         button {
             padding: 8px 16px;
             background-color: #007bff;
@@ -92,24 +107,29 @@
             border-radius: 5px;
             cursor: pointer;
         }
+
         button:hover {
             background-color: #0056b3;
         }
+
         .quiz-container {
             border: 1px solid #ccc;
             border-radius: 5px;
             padding: 10px;
             margin-bottom: 20px;
         }
+
         .quiz-container h3 {
             color: #333;
             font-size: 20px;
             margin-bottom: 10px;
         }
+
         .quiz-container p {
             color: #666;
             margin: 5px 0;
         }
+
         .best-quiz {
             background-color: #f0f0f0;
             border: 1px solid #999;
@@ -118,6 +138,7 @@
             margin-bottom: 20px;
             font-weight: bold;
         }
+
         .best-in-world {
             color: #fff;
             background-color: #ff6600;
@@ -125,11 +146,28 @@
             border-radius: 5px;
         }
     </style>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready( function () {
+            $('#myform').submit( function () {
+                var formdata = $(this).serialize();
+                $.ajax({
+                    type: "POST",
+                    url: "/add_group",
+                    data: formdata
+                 });
+                return false;
+            });
+        });
+    </script>
 </head>
+
 <body>
     <header>
-        <h1>Welcome, <%= name %></h1>
-        <p>Email: <%= email %></p>
+        <h1>Welcome, <%= name %>
+        </h1>
+        <p>Email: <%= email %>
+        </p>
     </header>
 
     <div class="sections-container">
@@ -139,13 +177,15 @@
             <form action="/faculty_view_group" method="post"> <!-- Wrap the select inside a form -->
                 <select name="selectedGroup" class="group-list">
                     <% gc.forEach(function(group) { %>
-                        <option value="<%= group %>"><%= group %></option>
-                    <% }); %>
-                   
+                        <option value="<%= group %>">
+                            <%= group %>
+                        </option>
+                        <% }); %>
+
                 </select>
                 <button type="submit">Go To Group</button>
             </form>
-            <form action="/add_group" method="post">
+            <form id = "myform" action="/add_group" method="post">
                 <input type="text" name="groupName" placeholder="Enter Group Name">
                 <input type="text" style="display: none;" name="email" value=<%= email %>>
 
@@ -154,6 +194,7 @@
 
                 <button type="submit">Add Group</button>
             </form>
+            
         </div>
 
         <!-- Quizzes Section -->
@@ -161,50 +202,85 @@
             <h2>Quizzes</h2>
             <% quizzes.forEach(function(quiz) { %>
                 <div class="quiz-container">
-                    <h3><%= quiz.title %></h3>
-                    <p>Start Date: <%= quiz.startDate %></p>
-                    <p>End Date: <%= quiz.endDate %></p>
-                    <p>Time of Quiz: <%= quiz.startTime %> - <%= quiz.time %></p>
+                    <h3>
+                        <%= quiz.title %>
+                    </h3>
+                    <p>Start Date: <%= quiz.startDate %>
+                    </p>
+                    <p>End Date: <%= quiz.endDate %>
+                    </p>
+                    <p>Time of Quiz: <%= quiz.startTime %> - <%= quiz.time %>
+                    </p>
                 </div>
-            <% }); %>
+                <% }); %>
         </div>
     </div>
 
     <script>
-var allGroups = <%= JSON.stringify(allGroups) %>;
-    console.log("Quizzes data:", allGroups);
+        var allGroups = <%- JSON.stringify(allGroups) %>;
+        console.log("group data:", allGroups);
 
-    function generateUniqueId() {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const idLength = 8;
-    let id = '';
+        // function submitForm() {
+        //     const form = document.getElementById('myForm');
+        //     console.log(form)
+        //     const formData = new FormData(form);
 
-    for (let i = 0; i < idLength; i++) {
-        const randomIndex = Math.floor(Math.random() * characters.length);
-        id += characters[randomIndex];
-    }
+        //     const obj = {};
 
-    return id;
-}
+        //     for(let ob of formData){
+        //         obj[ob[0]] = ob[1];
+        //     }
+
+        //     console.log(obj)
+
+        //     fetch('/add_group', {
+        //         method: 'POST',
+        //         body: obj
+        //     })
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         console.log('Success:', data);
+        //         // Handle success response
+        //     })
+        //     .catch((error) => {
+        //         console.error('Error:', error);
+        //         // Handle error
+        //     });
+        // }
 
 
-function generateUniqueGroupId() {
-    let uniqueId;
+        function generateUniqueId() {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            const idLength = 8;
+            let id = '';
 
-    do {
-        uniqueId = generateUniqueId();
-       
-    } while (allGroups.includes(uniqueId));
+            for (let i = 0; i < idLength; i++) {
+                const randomIndex = Math.floor(Math.random() * characters.length);
+                id += characters[randomIndex];
+            }
 
-    document.getElementById("gc").value=uniqueId;
+            return id;
+        }
 
-    console.log(uniqueId)
-}
+
+        function generateUniqueGroupId() {
+            let uniqueId;
+
+            do {
+                uniqueId = generateUniqueId();
+
+            } while (allGroups.includes(uniqueId));
+
+            document.getElementById("gc").value = uniqueId;
+
+            console.log(uniqueId)
+        }
 
 
 
 
     </script>
-    
+
 </body>
+
 </html>

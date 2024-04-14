@@ -85,8 +85,20 @@ app.post('/faculty_login', async (req, res) => {
             const email = userExist.email;
 
             const gc = userExist.groups;
+            console.log(gc)
             const groupCodes = gc.map(item => item.groupcode);
-
+            // const groupnames = gc.map(item => item.name);
+            // console.log(groupnames)
+            console.log(groupCodes)
+            const groups = await Group.aggregate([
+                {
+                    $match: {
+                        "groupCode" : { $in: groupCodes}
+                    }
+                }
+            ]);
+            const groupnames = groups.map(item => item.name)
+            console.log(groupnames)
             // Fetch quizzes based on group codes
             const quizzes = await Quizz.aggregate([
                 {
@@ -114,7 +126,7 @@ app.post('/faculty_login', async (req, res) => {
 
             console.log("grp:", groupsss);
             app.use(express.static("../frontend"));
-            return res.render(path.join(__dirname, "../frontend", "/faculty_home.ejs"), { name: fname, email: email, gc: groupCodes, quizzes: quizzes , allGroups:groupsss });
+            return res.render(path.join(__dirname, "../frontend", "/faculty_home.ejs"), { name: fname, email: email, gc: groupnames, quizzes: quizzes , allGroups:groupsss });
         } else {
             app.use(express.static("../frontend"));
             return res.render(path.join(__dirname, "../frontend", "/faculty_register.ejs"));
@@ -144,7 +156,7 @@ app.post('/faculty_view_group',async (req,res)=>{
     const quizzes = await Quizz.aggregate([
         {
             $match: {
-                "groupcode": {  selectedGroup }
+                "groupName": {  selectedGroup }
             }
         }
     ]);
