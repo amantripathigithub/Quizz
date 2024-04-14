@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #f7f7f7;
             margin: 0;
             padding: 0;
         }
@@ -29,6 +29,8 @@
         .quiz-card h3 {
             margin: 0;
             color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
         }
         .quiz-card p {
             margin: 5px 0;
@@ -46,6 +48,17 @@
         .start-button:hover {
             background-color: #45a049;
         }
+        .quiz-over {
+            color: #f00;
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+        }
+        #countdown {
+            font-size: 18px;
+            text-align: center;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -55,13 +68,54 @@
             <p><strong>Start Date:</strong> <%= quiz.startDate %></p>
             <p><strong>End Date:</strong> <%= quiz.endDate %></p>
             <p><strong>Duration:</strong> <%= quiz.time %> minutes</p>
-            <form action="/quiz_start" method="POST">
+            <div id="timer"></div>
+            <form id="quizForm" action="/quiz_start" method="POST">
+                <!-- <input type="text" id="curr" style="display: none;" name="curr" >
+                <input type="text" id="start" style="display: none;" name="start" >
+                <input type="text" id="end" style="display: none;" name="end" > -->
+
                 <input type="hidden" name="quizId" value="<%= quiz._id %>">
                 <input type="text" style="display: none;" name="email" value=<%= email %>>
+                <% if (currentTime < startTime) { %>
+                    <p id="countdown"></p>
 
-                <button class="start-button" type="submit">Start Quiz</button>
+                <% } else if (currentTime >= startTime && currentTime < endTime) { %>
+                    <button class="start-button" id="startButton" type="submit">Start Quiz</button>
+                <% } else { %>
+                    <p class="quiz-over">Quiz is Over</p>
+                <% } %>
             </form>
         </div>
     </div>
+
+    <script>
+        // Get the start and end time from the server-side rendering
+        const startTime = new Date("<%= quiz.startDate %>").getTime();
+        const endTime = new Date("<%= quiz.endDate %>").getTime();
+        const currentTime = new Date().getTime();
+
+        // If current time is less than start time, show dynamic timer
+        if (currentTime < startTime) {
+            const countdownElement = document.getElementById("countdown");
+            updateTimer();
+
+            function updateTimer() {
+                const timeLeft = startTime - new Date().getTime();
+
+                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                countdownElement.innerHTML = `Time left to start: ${hours}h ${minutes}m ${seconds}s`;
+
+                if (timeLeft <= 0) {
+                    countdownElement.innerHTML = "Quiz is starting...";
+                    document.getElementById("startButton").removeAttribute("disabled");
+                } else {
+                    setTimeout(updateTimer, 1000); // Call updateTimer every second
+                }
+            }
+        }
+    </script>
 </body>
 </html>

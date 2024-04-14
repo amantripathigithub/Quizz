@@ -6,15 +6,115 @@
     <title>Student Page</title>
     <link rel="stylesheet" href="student_home.css">
     <style>
-        .upcoming-quizzes {
-            width: 60%; /* Increased width */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
         }
-        .group-section {
-            width: 39.5%; /* Increased width */
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+        .user-info {
+            text-align: left;
+        }
+        .join-section {
+            display: flex;
+            align-items: center;
+        }
+        #course-code {
+            margin-right: 10px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        #join-button {
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        #join-button:hover {
+            background-color: #45a049;
+        }
+        main {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+        }
+        .group-section,
+        .upcoming-quizzes {
+            width: 48%; /* Equal width for both sections */
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .group-section h2,
+        .upcoming-quizzes h2 {
+            color: #f5f0f0;
+            margin-bottom: 20px;
+            font-size: 20px;
+            color: #fffdfd; /* New color for h2 text */
+        }
+        .group-section ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .group-section ul li {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #444;
+        }
+        .group-section ul li a {
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-weight: bold;
+        }
+        .group-section ul li a:hover {
+            color: #0056b3;
+        }
+        .upcoming-quizzes .quiz-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .quiz-details {
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            padding: 15px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .quiz-details:hover {
+            transform: translateY(-5px);
         }
         .quiz-details p {
-            margin: 0;
-            font-size: 8px; /* Smaller font size */
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+        .quiz-details p strong {
+            color: #333;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -27,12 +127,10 @@
         <form id="join-form" action="/join_group" method="post">
             <div class="join-section">
                 <input type="text" style="display: none;" name="email" value=<%= email %>>
-
                 <input type="text" id="course-code" name="gc" placeholder="Enter Course Code">
                 <button type="submit" id="join-button">Join</button>
             </div>
         </form>
-        
     </header>
 
     <main>
@@ -53,51 +151,45 @@
                 <% }); %>
             </ul>
         </div>
-        
 
         <div class="upcoming-quizzes">
             <h2>Upcoming Quizzes</h2>
             <div class="quiz-list">
                 <% quizzes.forEach(quiz => { %>
-                    <div class="quiz-details" onclick="submitQuizForm('<%= quiz._id %>')">
-                        <form action="/quiz_interface" method="POST" id="quizForm<%= quiz._id %>">
-                            <input type="hidden" name="quizId" value="<%= quiz._id %>">
-                            <input type="text" style="display: none;" name="email" value=<%= email %>>
+                    <% if (new Date(quiz.endDate) > new Date() && quiz.result.every(result => result.email !== email)) { %>
+                        <div class="quiz-details" onclick="submitQuizForm('<%= quiz._id %>')">
+                            <form action="/quiz_interface" method="POST" id="quizForm<%= quiz._id %>">
+                                <input type="hidden" name="quizId" value="<%= quiz._id %>">
+                                <input type="text" style="display: none;" name="email" value=<%= email %>>
 
-                            <p>
-                                <strong>Name:</strong> <%= quiz.title %> | 
-                                <strong>Start Time:</strong> <%= quiz.startDate %> | 
-                                <strong>End Time:</strong> <%= quiz.endDate %> | 
-                                <strong>Duration:</strong> <%= quiz.time %> minutes
-                            </p>
-                        </form>
-                    </div>
+                                <p>
+                                    <strong>Name:</strong> <%= quiz.title %> | 
+                                    <strong>Start Time:</strong> <%= quiz.startDate %> | 
+                                    <strong>End Time:</strong> <%= quiz.endDate %> | 
+                                    <strong>Duration:</strong> <%= quiz.time %> minutes
+                                </p>
+                            </form>
+                        </div>
+                    <% } %>
                 <% }); %>
             </div>
         </div>
-        
     </main>
 
     <script>
+        function submitGroupForm(groupId) {
+            const form = document.getElementById('groupForm' + groupId);
+            form.submit();
+        }
 
-
-function submitGroupForm(groupId) {
-    const form = document.getElementById('groupForm' + groupId);
-    form.submit();
-}
-
-
-function submitQuizForm(quizId) {
-    const form = document.getElementById('quizForm' + quizId);
-    if (form) {
-        form.submit();
-    } else {
-        console.error('Form not found for quizId:', quizId);
-    }
-}
-
-
-
+        function submitQuizForm(quizId) {
+            const form = document.getElementById('quizForm' + quizId);
+            if (form) {
+                form.submit();
+            } else {
+                console.error('Form not found for quizId:', quizId);
+            }
+        }
     </script>
 </body>
 </html>

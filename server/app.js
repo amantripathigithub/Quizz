@@ -90,15 +90,15 @@ app.post('/faculty_login', async (req, res) => {
             // const groupnames = gc.map(item => item.name);
             // console.log(groupnames)
             console.log(groupCodes)
-            const groups = await Group.aggregate([
+            const groups_obj = await Group.aggregate([
                 {
                     $match: {
                         "groupCode" : { $in: groupCodes}
                     }
                 }
             ]);
-            const groupnames = groups.map(item => item.name)
-            console.log(groupnames)
+            //const groupnames = groups.map(item => item.name)
+            //console.log(groupnames)
             // Fetch quizzes based on group codes
             const quizzes = await Quizz.aggregate([
                 {
@@ -126,7 +126,7 @@ app.post('/faculty_login', async (req, res) => {
 
             console.log("grp:", groupsss);
             app.use(express.static("../frontend"));
-            return res.render(path.join(__dirname, "../frontend", "/faculty_home.ejs"), { name: fname, email: email, gc: groupnames, quizzes: quizzes , allGroups:groupsss });
+            return res.render(path.join(__dirname, "../frontend", "/faculty_home.ejs"), { name: fname, email: email, gc: groups_obj, quizzes: quizzes , allGroups:groupsss });
         } else {
             app.use(express.static("../frontend"));
             return res.render(path.join(__dirname, "../frontend", "/faculty_register.ejs"));
@@ -161,6 +161,20 @@ app.post('/faculty_view_group',async (req,res)=>{
         }
     ]);
 
+    let gn;
+
+    Group.findOne({ groupCode: selectedGroup })
+    .then(group => {
+        if (group) {
+            gn=group.name;
+            console.log('Found group:', group);
+        } else {
+            console.log('Group not found');
+        }
+    })
+    .catch(error => {
+        console.error('Error finding group:', error);
+    });
 
 
 
@@ -185,7 +199,7 @@ app.post('/faculty_view_group',async (req,res)=>{
 
 
     app.use(express.static("../frontend"));
-    return  res.render(path.join(__dirname, "../frontend", "/view_group.ejs"),{gc:selectedGroup,quizzes:quizzes,students:students});
+    return  res.render(path.join(__dirname, "../frontend", "/view_group.ejs"),{gn:gn,gc:selectedGroup,quizzes:quizzes,students:students});
 
 
 })
@@ -241,7 +255,7 @@ app.post('/create_quiz',async(req,res)=>{
     
     gc = req.body.gc;
 
-console.log(gc);
+    console.log(gc);
 
     app.use(express.static("../frontend"));
    return  res.render(path.join(__dirname, "../frontend", "/create_quiz.ejs"),{gc:gc});
@@ -508,9 +522,13 @@ app.post('/quiz_interface',async(req,res)=>{
             // If quiz is found, return the result array
             
 
+        const startTime = new Date(foundQuiz.startDate).getTime();
+        const endTime = new Date(foundQuiz.endDate).getTime();
+        const currentTime = new Date().getTime();
+
             // new
             app.use(express.static("../frontend"));
-            return  res.render(path.join(__dirname, "../frontend", "/quiz_interface.ejs"),{email:em,quiz:foundQuiz});
+            return  res.render(path.join(__dirname, "../frontend", "/quiz_interface.ejs"),{email:em,quiz:foundQuiz,startTime:startTime,endTime:endTime,currentTime:currentTime});
          
          
          
@@ -543,7 +561,7 @@ app.post('/quiz_leaderboard',async(req,res)=>{
     
     let quizId = req.body.quizId;
 
-    let em= req.body.email;
+    let emaill = req.body.email;
 let sr;
 
     try {
@@ -560,24 +578,28 @@ let sr;
 
             try {
                 // Extract roll numbers from the array
-                const rollNos = sr.map(item => item.rollno);
+                const emails = sr.map(item => item.email);
         
                 // Find students based on roll numbers
-                const students = await Student.find({ rollNo: { $in: rollNos } });
+                const students = await Student.find({ email: { $in: emails } });
         
                 // Create an array of objects with name, roll number, and marks
                 const relatedData = students.map(student => {
-                    const { name, rollNo } = student;
-                    const markObject = rollNoMarksArray.find(item => item.rollno === rollNo);
-                    const marks = markObject ? markObject.marks : 0;
-                    return { name, rollNo, marks };
+                    const { name, rollNo , email} = student;
+                    const markObject = sr.find(item => item.email === email);
+                    const marks = markObject ? markObject.score : 0;
+                    return { name, rollNo, marks ,email};
                 });
         
                 sr= relatedData;
 
                 console.log(sr);
+
+                sr.sort((a, b) => b.marks - a.marks);
+
+
                 app.use(express.static("../frontend"));
-                return  res.render(path.join(__dirname, "../frontend", "/quiz_leaderboard.ejs"),{email:em,sr:sr});
+                return  res.render(path.join(__dirname, "../frontend", "/quiz_leaderboard.ejs"),{em:emaill,sr:sr});
              
 
             } catch (err) {
@@ -724,15 +746,50 @@ app.post('/quiz_start',async(req,res)=>{
 })
 
 
+app.post('/quiz_submit',async (req, res) => {
+    // Access form data from request body
+    //const totalMarks = req.body.totalMarks;
+    console.log(req.body);
+    // Handle the data as needed
+    //console.log('Total Marks:', totalMarks);
+    // Send a response
 
-app.post('/quiz_submit',async(req,res)=>{
-    
-   console.log(req.body);
-   const totalMarks = req.body.totalMarks;
+    let quizId = req.body.quizId;
+    let email = req.body.email;
+    let marks = req.body.mark;
 
-   console.log(totalMarks)
-})
 
+    try {
+        // Search for the quiz by its ID
+        const quiz = await Quizz.findById(quizId);
+
+        if (!quiz) {
+            console.log('Quiz not found');
+            return;
+        }
+
+        // Check if the email already exists in the result array
+        const existingResult = quiz.result.find(result => result.email === email);
+
+        if (existingResult) {
+            console.log('Result for this email already exists');
+            return;
+        }
+
+        // If the email doesn't exist, push a new result object
+        quiz.result.push({ email: email, score: marks });
+
+        // Save the updated quiz
+        await quiz.save();
+        console.log('Result updated successfully');
+    } catch (error) {
+        console.error('Error updating quiz result:', error);
+    }
+
+
+
+    res.send('Form submitted successfully');
+});
 
 
 

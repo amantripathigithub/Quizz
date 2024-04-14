@@ -177,8 +177,8 @@
             <form action="/faculty_view_group" method="post"> <!-- Wrap the select inside a form -->
                 <select name="selectedGroup" class="group-list">
                     <% gc.forEach(function(group) { %>
-                        <option value="<%= group %>">
-                            <%= group %>
+                        <option value="<%= group.groupCode %>">
+                            <%= group.name %>
                         </option>
                         <% }); %>
 

@@ -117,6 +117,10 @@
         <h2><%= quiz.title %></h2>
         <% if (quiz) { %>
             <form id="quizForm" action="/quiz_submit" method="POST">
+                <input type="text" style="display: none;" name="email" value=<%= email %>>
+                <input type="text" id="mark" style="display: none;" name="mark">
+                <input type="text" style="display: none;" name="quizId" value=<%= quiz._id %>>
+
                 <% quiz.questions.forEach((question, index) => { %>
                     <div class="question-card" id="question<%= index %>" <%= index !== 0 ? 'style="display: none;"' : '' %>>
                         <h3>Question <%= index + 1 %></h3>
@@ -136,7 +140,8 @@
                     <button type="button" class="navigation-button" id="prevButton">Previous</button>
                     <button type="button" class="navigation-button" id="nextButton">Next</button>
                 </div>
-                <button id="submitQuizButton" class="submit-button"  type="button">Submit Quiz</button>
+                <button id="submitQuizButton" class="submit-button" onclick="click()" type="button" >Submit Quiz</button>
+                <button id="finalsubmit" style="display: none;" class="submit-button"  type="submit" >Submit Quiz final</button>
             </form>
         <% } else { %>
             <p>No quiz found.</p>
@@ -149,7 +154,7 @@
     <script>
 
 const quiz = <%- JSON.stringify(quiz) %>;
-
+       // var totalMarks =0;
         document.addEventListener('DOMContentLoaded', function() {
             const questions = document.querySelectorAll('.question-card');
             const quizForm = document.getElementById('quizForm');
@@ -190,7 +195,11 @@ const quiz = <%- JSON.stringify(quiz) %>;
             // Event listener for the "Submit Quiz" button
             document.getElementById('submitQuizButton').addEventListener('click', function() {
                 // Calculate total marks before submitting the form
-                calculateTotalMarks();
+                totalMarks =  calculateTotalMarks();
+
+                document.getElementById("mark").value=totalMarks;
+
+                document.getElementById("finalsubmit").click();
                 
                 // Submit the form with additional data (e.g., total marks)
                 submitQuiz();
@@ -205,13 +214,15 @@ const quiz = <%- JSON.stringify(quiz) %>;
                         totalMarks += quiz.questions[index].marks;
                     }
                 });
+
+                return totalMarks;
             }
     
             // Function to submit the quiz
             function submitQuiz() {
                 const formData = new FormData(quizForm);
                 formData.append('totalMarks', totalMarks);
-                console.log(formData);
+                console.log("j");
                 fetch(quizForm.action, {
                     method: 'POST',
                     body: formData
@@ -241,7 +252,7 @@ const quiz = <%- JSON.stringify(quiz) %>;
                 } else {
                     clearInterval(timerInterval);
                     // Submit the quiz when time runs out
-                    submitQuiz();
+                    document.getElementById('submitQuizButton').click();
                 }
             }, 1000);
         });

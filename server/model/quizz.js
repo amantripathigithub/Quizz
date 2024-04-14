@@ -10,7 +10,7 @@ const questionSchema = new Schema({
 });
 
 const stuResult = new Schema({
-    rollno: {type: String},
+    email: {type: String},
     score:{type:Number},
 })
 
