@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Page</title>
+    <link rel="stylesheet" href="student_home.css">
+    <style>
+        .upcoming-quizzes {
+            width: 60%; /* Increased width */
+        }
+        .group-section {
+            width: 39.5%; /* Increased width */
+        }
+        .quiz-details p {
+            margin: 0;
+            font-size: 8px; /* Smaller font size */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="user-info">
+            <p>Group Name: <%= gn %></p>
+            <p>Group Code: <%= gc %></p>
+        </div>
+       
+        
+    </header>
+
+    <main>
+        
+        
+
+        <div class="upcoming-quizzes">
+            <h2>All Quizzes</h2>
+            <div class="quiz-list">
+                <% quizzes.forEach(quiz => { %>
+                    <div class="quiz-details" onclick="submitQuizForm('<%= quiz._id %>', '<%= email %>')">
+                        <form action="/quiz_leaderboard" method="post" id="quizForm<%= quiz._id %>">
+                            <input type="hidden" name="quizId" value="<%= quiz._id %>">
+                            <input type="hidden" name="email" value="<%= email %>">
+                            <p>
+                                <strong>Name:</strong> <%= quiz.title %> | 
+                                <strong>Start Time:</strong> <%= quiz.startDate %> | 
+                                <strong>End Time:</strong> <%= quiz.endDate %> | 
+                                <strong>Duration:</strong> <%= quiz.time %> minutes
+                            </p>
+                        </form>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+        
+        
+    </main>
+
+    <script>
+
+function submitQuizForm(quizId, email) {
+    const form = document.getElementById('quizForm' + quizId);
+    if (form) {
+        form.submit();
+    } else {
+        console.error('Form not found for quizId:', quizId);
+    }
+}
+
+
+
+
+    </script>
+</body>
+</html>

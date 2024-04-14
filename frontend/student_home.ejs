@@ -24,38 +24,80 @@
             <p>Name: <%= name %></p>
             <p>Email: <%= email %></p>
         </div>
-        <div class="join-section">
-            <input type="text" id="course-code" placeholder="Enter Course Code">
-            <button id="join-button">Join</button>
-        </div>
+        <form id="join-form" action="/join_group" method="post">
+            <div class="join-section">
+                <input type="text" style="display: none;" name="email" value=<%= email %>>
+
+                <input type="text" id="course-code" name="gc" placeholder="Enter Course Code">
+                <button type="submit" id="join-button">Join</button>
+            </div>
+        </form>
+        
     </header>
 
     <main>
         <div class="group-section">
             <h2>My Groups</h2>
             <ul>
-                <% gc.forEach(group => { %>
+                <% groups.forEach(group => { %>
                     <li>
-                        <a href="/groups/<%= group.id %>"><%= group %></a>
+                        <form action="/show_group_student" method="post" id="groupForm<%= group.groupCode %>">
+                            <input type="hidden" name="groupId" value="<%= group.groupCode %>">
+                            <input type="hidden" name="groupName" value="<%= group.name %>">
+                            <input type="text" style="display: none;" name="email" value=<%= email %>>
+                            <a href="#" onclick="submitGroupForm('<%= group.groupCode %>')">
+                                <%= group.name %>
+                            </a>
+                        </form>
                     </li>
                 <% }); %>
             </ul>
         </div>
+        
 
         <div class="upcoming-quizzes">
             <h2>Upcoming Quizzes</h2>
             <div class="quiz-list">
                 <% quizzes.forEach(quiz => { %>
-                    <div class="quiz-details">
-                        <a href="/quizzes/<%= quiz.id %>">
-                            <p><strong>Name:</strong> <%= quiz.title %> | <strong>Start Time:</strong> <%= quiz.startDate %> | <strong>End Time:</strong> <%= quiz.endDate %> | <strong>Duration:</strong> <%= quiz.time %> minutes</p>
-                        </a>
+                    <div class="quiz-details" onclick="submitQuizForm('<%= quiz._id %>')">
+                        <form action="/quiz_interface" method="POST" id="quizForm<%= quiz._id %>">
+                            <input type="hidden" name="quizId" value="<%= quiz._id %>">
+                            <input type="text" style="display: none;" name="email" value=<%= email %>>
+
+                            <p>
+                                <strong>Name:</strong> <%= quiz.title %> | 
+                                <strong>Start Time:</strong> <%= quiz.startDate %> | 
+                                <strong>End Time:</strong> <%= quiz.endDate %> | 
+                                <strong>Duration:</strong> <%= quiz.time %> minutes
+                            </p>
+                        </form>
                     </div>
                 <% }); %>
             </div>
         </div>
+        
     </main>
 
-    <script></script>
+    <script>
+
+
+function submitGroupForm(groupId) {
+    const form = document.getElementById('groupForm' + groupId);
+    form.submit();
+}
+
+
+function submitQuizForm(quizId) {
+    const form = document.getElementById('quizForm' + quizId);
+    if (form) {
+        form.submit();
+    } else {
+        console.error('Form not found for quizId:', quizId);
+    }
+}
+
+
+
+    </script>
 </body>
 </html>

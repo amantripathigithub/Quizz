@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .list-item.clicked {
+      background-color: #f0f0f0;
+    }
+    .header {
+      background-color: black;
+      color: white;
+      position: fixed;
+      top: 50px;
+      width: 100%;
+      z-index: 998;
+    }
+    .leaderboard-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 999;
+      background-color: #4a5568; /* Background color */
+      padding: 0.75rem; /* Padding */
+      box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1); /* Shadow effect */
+    }
+    .leaderboard-container {
+      margin-top: 100px; /* Adjusted margin-top */
+      height: calc(100vh - 100px); /* Adjust height for the viewport */
+      overflow-y: auto;
+    }
+    .list-item:hover {
+      background-color: #edf2f7; /* Hover background color */
+    }
+  </style>
+  <script>
+    function handleClick(event) {
+      const listItem = event.target.closest('.list-item');
+      if (listItem) {
+        listItem.classList.add('clicked');
+        setTimeout(() => {
+          listItem.classList.remove('clicked');
+        }, 300); // Change 300 to the desired duration in milliseconds
+      }
+    }
+  </script>
+</head>
+<body>
+    <div class="leaderboard-header bg-gray-800 text-white text-center py-4">Leaderboard</div>
+    <div class="header px-4 py-2 flex justify-between rounded-t-lg">
+        <div class="w-1/4">Rank</div>
+        <div class="w-1/4">Registration Number</div>
+        <div class="w-1/4 text-center">Name</div>
+        <div class="w-1/4 text-right">Marks</div>
+        
+    </div>
+    <div class="leaderboard-container">
+        <ul role="list" class="border rounded-b-lg divide-y divide-gray-100" onclick="handleClick(event)">
+            <% sr.forEach((student, index) => { %>
+            <a href="#" class="block list-item">
+                <li class="flex justify-between py-5 px-4">
+                    <div class="w-1/4">
+                        <p class="mt-1 text-xs leading-5 text-gray-500"><%= index + 1 %></p>
+                    </div>
+                    <div class="w-1/4">
+                        <p class="text-sm font-semibold leading-6 text-gray-900"><%= student.registrationNumber %></p>
+                    </div>
+                    <div class="w-1/4">
+                        <p class="mt-1 text-xs leading-5 text-gray-500"><%= student.name %></p>
+                    </div>
+                    <div class="w-1/4">
+                        <p class="mt-1 text-xs leading-5 text-gray-500"><%= student.marks %></p>
+                    </div>
+                   
+                </li>
+            </a>
+            
+            <% }); %>
+        </ul>
+    </div>
+</body>
+</html>

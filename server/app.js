@@ -39,7 +39,7 @@ const Quizz = require('./model/quizz');
 const Group = require('./model/group');
 
 const Student = require('./model/student');
-const { time } = require('console');
+const { time, group } = require('console');
 const { title } = require('process');
 
 
@@ -156,7 +156,7 @@ app.post('/faculty_view_group',async (req,res)=>{
     const quizzes = await Quizz.aggregate([
         {
             $match: {
-                "groupName": {  selectedGroup }
+                "groupcode": selectedGroup
             }
         }
     ]);
@@ -190,6 +190,44 @@ app.post('/faculty_view_group',async (req,res)=>{
 
 })
 
+
+
+// join group for student
+
+
+app.post('/join_group',async(req,res)=>{
+    
+    gc = req.body.gc;
+    email = req.body.email;
+
+
+
+console.log(gc);
+
+
+try {
+        // Find the student by email and update the groupCodes array
+        const student = await Student.findOneAndUpdate(
+            { email: email }, // Search criteria
+            { $addToSet: { groupCodes: gc } }, // Update operation to add the group code to the array
+            { new: true, useFindAndModify: false } // Options
+        );
+
+        // Handle success
+        console.log('Student:', student);
+    } catch (err) {
+        // Handle error
+        console.error('Error:', err);
+    }
+
+
+
+//     app.use(express.static("../frontend"));
+//    return  res.render(path.join(__dirname, "../frontend", "/create_quiz.ejs"),{gc:gc});
+
+
+
+})
 
 
 app.get('/faculty_register',(req,res) =>{
@@ -415,6 +453,156 @@ app.post('/student_register',async(req,res)=>{
 
 })
 
+// showing group to student
+
+
+
+app.post('/show_group_student',async(req,res)=>{
+    
+    let gc = req.body.groupId;
+    let gn = req.body.groupName;
+
+    let em= req.body.email;
+
+
+    const quizzes = await Quizz.aggregate([
+        {
+            $match: {
+                "groupcode": gc
+            }
+        }
+    ]);
+
+
+
+
+
+    console.log("Quizzes:", quizzes);
+
+
+    app.use(express.static("../frontend"));
+   return  res.render(path.join(__dirname, "../frontend", "/student_view_group.ejs"),{email:em,gc:gc,gn:gn,quizzes:quizzes});
+
+
+
+
+
+
+})
+
+// quiz interface
+
+
+
+app.post('/quiz_interface',async(req,res)=>{
+    
+    let id = req.body.quizId;
+
+    let em= req.body.email;
+
+    try {
+        // Find the quiz by quizId
+        const foundQuiz = await Quizz.findOne({ _id: id });
+
+        if (foundQuiz) {
+            // If quiz is found, return the result array
+            
+
+            // new
+            app.use(express.static("../frontend"));
+            return  res.render(path.join(__dirname, "../frontend", "/quiz_interface.ejs"),{email:em,quiz:foundQuiz});
+         
+         
+         
+
+
+
+           
+
+        } else {
+            // If quiz is not found, return null or throw an error
+            console.log("not found result of quizz"); // or throw new Error('Quiz not found');
+        }
+    } catch (err) {
+        // Handle error
+        console.error('Error:', err);
+        return null; // or throw err;
+    }
+    
+
+   
+
+
+
+})
+
+
+
+
+app.post('/quiz_leaderboard',async(req,res)=>{
+    
+    let quizId = req.body.quizId;
+
+    let em= req.body.email;
+let sr;
+
+    try {
+        // Find the quiz by quizId
+        const foundQuiz = await Quizz.findOne({ _id: quizId });
+
+        if (foundQuiz) {
+            // If quiz is found, return the result array
+            sr =  foundQuiz.result;
+
+            // new
+
+
+
+            try {
+                // Extract roll numbers from the array
+                const rollNos = sr.map(item => item.rollno);
+        
+                // Find students based on roll numbers
+                const students = await Student.find({ rollNo: { $in: rollNos } });
+        
+                // Create an array of objects with name, roll number, and marks
+                const relatedData = students.map(student => {
+                    const { name, rollNo } = student;
+                    const markObject = rollNoMarksArray.find(item => item.rollno === rollNo);
+                    const marks = markObject ? markObject.marks : 0;
+                    return { name, rollNo, marks };
+                });
+        
+                sr= relatedData;
+
+                console.log(sr);
+                app.use(express.static("../frontend"));
+                return  res.render(path.join(__dirname, "../frontend", "/quiz_leaderboard.ejs"),{email:em,sr:sr});
+             
+
+            } catch (err) {
+                console.error('Error:', err);
+                return null; // or throw err;
+            }
+
+           
+
+        } else {
+            // If quiz is not found, return null or throw an error
+            console.log("not found result of quizz"); // or throw new Error('Quiz not found');
+        }
+    } catch (err) {
+        // Handle error
+        console.error('Error:', err);
+        return null; // or throw err;
+    }
+
+    
+
+
+
+
+})
 
 
 app.get('/student_login',(req,res) =>{
@@ -439,6 +627,19 @@ app.post('/student_login',async(req,res)=>{
             const email = userExist.email;
             const roll = userExist.rollNo;
             const gc = userExist.groupCodes;
+let groups;
+
+            try {
+                // Find all groups where groupCode is in the groupCodesArray
+                groups = await Group.find({ groupCode: { $in: gc } });
+        
+                // Handle success
+                console.log('Groups:', groups);
+            } catch (err) {
+                // Handle error
+                console.error('Error:', err);
+            }
+        
             
 
             // Fetch quizzes based on group codes
@@ -451,9 +652,12 @@ app.post('/student_login',async(req,res)=>{
             ]);
 
 
+
+
+
             console.log("Quizzes:", quizzes);
             app.use(express.static("../frontend"));
-            return res.render(path.join(__dirname, "../frontend", "/student_home.ejs"), { name: sname, email: email,roll:roll, gc: gc, quizzes: quizzes });
+            return res.render(path.join(__dirname, "../frontend", "/student_home.ejs"), { name: sname, email: email,roll:roll, groups: groups, quizzes: quizzes });
         } else {
             app.use(express.static("../frontend"));
             return res.render(path.join(__dirname, "../frontend", "/student_register.ejs"));
@@ -469,6 +673,68 @@ app.post('/student_login',async(req,res)=>{
 
 
 })
+
+
+
+
+// start quiz 
+
+
+app.post('/quiz_start',async(req,res)=>{
+    
+    let id = req.body.quizId;
+
+    let em= req.body.email;
+
+    try {
+        // Find the quiz by quizId
+        const foundQuiz = await Quizz.findOne({ _id: id });
+
+        if (foundQuiz) {
+            // If quiz is found, return the result array
+            
+
+            // new
+            app.use(express.static("../frontend"));
+            return  res.render(path.join(__dirname, "../frontend", "/quiz_start2.ejs"),{email:em,quiz:foundQuiz});
+         
+         
+         
+
+
+
+
+           
+
+        } else {
+            // If quiz is not found, return null or throw an error
+            console.log("not found result of quizz"); // or throw new Error('Quiz not found');
+        }
+    } catch (err) {
+        // Handle error
+        console.error('Error:', err);
+        return null; // or throw err;
+    }
+    
+
+   
+
+
+
+})
+
+
+
+app.post('/quiz_submit',async(req,res)=>{
+    
+   console.log(req.body);
+   const totalMarks = req.body.totalMarks;
+
+   console.log(totalMarks)
+})
+
+
+
 
 app.listen(PORT, () => {
     console.log("Server listening on port " + `${PORT}`);
