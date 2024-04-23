@@ -37,7 +37,7 @@ app.use(bodyParser.json());
 const faculty = require('./model/faculty');
 const Quizz = require('./model/quizz');
 const Group = require('./model/group');
-
+const Otp = require('./model/otp');
 const Student = require('./model/student');
 const { time, group } = require('console');
 const { title } = require('process');
@@ -405,20 +405,43 @@ await  Quizz.create({groupcode:gc,title:title,questions:q,startDate:start,endDat
 
 })
 
+const nodemailer = require('nodemailer');
 
+// Initialize Nodemailer transport
+const tp = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'resell.noreply.verify@gmail.com',
+        pass: 'aghgnbsfwbrtzzrv'
+    }
+});
+
+// Function to send OTP email
+async function sendMail(email, otp) {
+    try {
+        const mailOptions = {
+            from: 'resell.noreply.verify@gmail.com',
+            to: email,
+            subject: 'MyQuizz Email Verification',
+            text: `Your OTP: ${otp}`,
+        };
+
+        const result = await tp.sendMail(mailOptions);
+        console.log('Email sent successfully:', result);
+    } catch (error) {
+        console.error('Error sending email:', error);
+        throw error;
+    }
+}
+
+// Handle faculty registration
 app.post('/faculty_register', async (req, res) => {
-    const fname = req.body.name;
-    const email = req.body.email;
-    const pass = req.body.password;
-
-    console.log(fname);
-    console.log(email);
-    console.log(pass);
+    const { name, email, password } = req.body;
 
     try {
-        // Check if email is provided
-        if (!email) {
-            throw new Error('Email address is required.');
+        // Validate input
+        if (!email || !name || !password) {
+            throw new Error('All fields are required.');
         }
 
         // Check if email is unique
@@ -427,17 +450,69 @@ app.post('/faculty_register', async (req, res) => {
             throw new Error('Email address already exists.');
         }
 
-        // Create faculty document
-        //const gc = [{ groupcode: "temp" }];
-        await faculty.create({ name: fname, email: email, password: pass });
+        // Generate OTP
+        const otpLength = 6;
+        let otp = '';
+        for (let i = 0; i < otpLength; i++) {
+            otp += Math.floor(Math.random() * 10);
+        }
 
-        // Redirect or render success page
-        res.render(path.join(__dirname, "../frontend", "/faculty_login.ejs"));
+        // Send OTP email
+        await sendMail(email, otp);
+
+        // Save OTP in database
+        let otpDocument = await Otp.findOne({ email });
+        if (!otpDocument) {
+            otpDocument = new Otp({ email, code: otp });
+        } else {
+            otpDocument.code = otp; // Update the existing OTP
+        }
+        await otpDocument.save();
+
+        // Render OTP verification page
+        res.render(path.join(__dirname, "../frontend", "/faculty_login_otp.ejs"), { email, fname: name, pass: password });
+
     } catch (error) {
-        console.error('Error registering faculty:', error.message);
-        res.status(400).send(error.message); // Send error message back to client
+        console.error('Error in faculty registration:', error.message);
+        res.status(400).send(error.message);
     }
 });
+
+// verify otp faculty
+
+app.post('/verify_otp_faculty',async(req,res)=>{
+    
+    email = req.body.email;
+    otp = req.body.otp;
+
+    fname = req.body.fname;
+    pass = req.body.pass;
+
+
+
+    try {
+        // Find the OTP document with the given email and OTP
+        const otpDocument = await Otp.findOne({ email, code: otp });
+
+        if (otpDocument) {
+            console.log('Email and OTP found in the database.');
+            await faculty.create({ name: fname, email: email, password: pass });
+            res.render(path.join(__dirname, "../frontend", "/faculty_login.ejs"));
+             // Email and OTP exist in the database
+        } else {
+            console.log('Email or OTP not found in the database.');
+             // Email or OTP does not exist in the database
+             res.render(path.join(__dirname, "../frontend", "/not_matching_otp.ejs"));
+
+        }
+    } catch (error) {
+        console.error('Error checking OTP in the database:', error.message);
+         // Return false in case of an error
+    }
+
+
+})
+
 
 
 
