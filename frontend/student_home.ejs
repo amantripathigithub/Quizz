@@ -8,9 +8,22 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f9f9f9;
+            background: linear-gradient(45deg, #FFD700, #FFA500, #FF8C00, #FF6347, #FF4500);
+            background-size: 400% 400%;
+            animation: gradient 10s ease infinite;
             margin: 0;
             padding: 0;
+        }
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
         }
         header {
             background-color: #333;

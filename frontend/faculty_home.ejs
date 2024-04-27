@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,10 +9,24 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+            background: linear-gradient(45deg, #FFD700, #FFA500, #FF8C00);
+            background-size: 400% 400%;
+            animation: gradient 5s ease infinite;
             display: flex;
             flex-direction: column;
             align-items: center;
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         header {
@@ -33,7 +46,7 @@
         }
 
         .section {
-            background-color: #fff;
+            background-color: #add8e6; /* Light blue background */
             border-radius: 5px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
@@ -41,110 +54,11 @@
             width: 100%;
         }
 
-        h2 {
-            color: #333;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 10px;
-        }
-
-        .group-list {
-            width: calc(50% - 10px);
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-            margin-bottom: 20px;
-        }
-
-        .group-list p {
-            margin: 5px 0;
-            color: #666;
-            cursor: pointer;
-        }
-
-        .group-list p:hover {
-            background-color: #f0f0f0;
-        }
-
-        .group-list::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        .group-list::-webkit-scrollbar-thumb {
-            background-color: #888;
-            border-radius: 5px;
-        }
-
-        .group-list::-webkit-scrollbar-track {
-            background-color: #f4f4f4;
-            border-radius: 5px;
-        }
-
-        .group-list::-webkit-scrollbar-thumb:hover {
-            background-color: #555;
-        }
-
-        form {
-            margin-bottom: 20px;
-        }
-
-        input[type="text"] {
-            width: calc(50% - 10px);
-            padding: 8px;
-            margin-right: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-
-        button {
-            padding: 8px 16px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
         .quiz-container {
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-            margin-bottom: 20px;
+            border-top: 1px solid #ccc; /* Separator line */
+            padding-top: 20px; /* Space between quizzes */
         }
 
-        .quiz-container h3 {
-            color: #333;
-            font-size: 20px;
-            margin-bottom: 10px;
-        }
-
-        .quiz-container p {
-            color: #666;
-            margin: 5px 0;
-        }
-
-        .best-quiz {
-            background-color: #f0f0f0;
-            border: 1px solid #999;
-            border-radius: 5px;
-            padding: 10px;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-
-        .best-in-world {
-            color: #fff;
-            background-color: #ff6600;
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
     </style>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
     <script type="text/javascript">
@@ -213,7 +127,10 @@
                     <p>Time of Quiz: <%= quiz.startTime %> - <%= quiz.time %>
                     </p>
                 </div>
-                <% }); %>
+                <% if (quizzes.indexOf(quiz) !== quizzes.length - 1) { %>
+                    <hr /> <!-- Add separator unless it's the last quiz -->
+                <% } %>
+            <% }); %>
         </div>
     </div>
 
@@ -276,12 +193,7 @@
 
             console.log(uniqueId)
         }
-
-
-
-
     </script>
 
 </body>
-
 </html>

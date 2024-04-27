@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(45deg, #FFD700, #FFA500, #FF8C00);
+            background-size: 400% 400%;
+            animation: gradient 5s ease infinite;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        .container {
+            text-align: center;
+        }
+        h1 {
+            font-size: 36px;
+            color: #fff;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        form {
+            display: inline-block;
+            margin: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: #FFA500;
+            background-image: linear-gradient(to right, #FFA500, #FFD700);
+            color: #fff;
+            cursor: pointer;
+            border-radius: 5px;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #FFB732;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Our Platform!</h1>
+        <form action="/register_student_b" method="POST">
+            <button type="submit">Register as a Student</button>
+        </form>
+        <form action="/login_student_b" method="POST">
+            <button type="submit">Login as a Student</button>
+        </form>
+        <form action="/register_faculty_b" method="POST">
+            <button type="submit">Register as Faculty</button>
+        </form>
+        <form action="/login_faculty_b" method="POST">
+            <button type="submit">Login as Faculty</button>
+        </form>
+    </div>
+</body>
+</html>

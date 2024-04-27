@@ -49,9 +49,18 @@ const { title } = require('process');
 // const Quiz  = require('./model/quiz');
 
 
+app.get('/',(req,res)=>{
+    
+    app.use(express.static("../frontend"));
+    return res.render(path.join(__dirname, "../frontend", "/homepage.ejs"));
+
+})
+
 app.get('/faculty_login',(req,res) =>{
 
     app.use(express.static("../frontend"));
+    //return res.render(path.join(__dirname, "../frontend", "/homepage.ejs"));
+
    return  res.render(path.join(__dirname, "../frontend", "/faculty_login.ejs"));
 
 })
@@ -1006,6 +1015,46 @@ let groups;
 
     res.send('Form submitted successfully');
 });
+
+
+
+
+app.post('/register_student_b',async(req,res)=>{
+    
+    app.use(express.static("../frontend"));
+    return res.render(path.join(__dirname, "../frontend", "/student_register.ejs"));
+
+})
+
+
+
+
+app.post('/login_student_b',async(req,res)=>{
+    
+    app.use(express.static("../frontend"));
+    return res.render(path.join(__dirname, "../frontend", "/student_login.ejs"));
+
+})
+
+
+
+app.post('/register_faculty_b',async(req,res)=>{
+    
+    app.use(express.static("../frontend"));
+    return res.render(path.join(__dirname, "../frontend", "/faculty_register.ejs"));
+
+})
+
+
+
+app.post('/login_faculty_b',async(req,res)=>{
+    
+    app.use(express.static("../frontend"));
+    return res.render(path.join(__dirname, "../frontend", "/faculty_login.ejs"));
+
+})
+
+
 
 
 

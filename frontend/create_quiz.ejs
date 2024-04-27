@@ -1,5 +1,3 @@
-<!-- create_quiz.ejs -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,9 +7,22 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background: linear-gradient(45deg, #FFD700, #FFA500, #FF8C00);
+            background-size: 400% 400%;
+            animation: gradient 5s ease infinite;
             margin: 0;
             padding: 0;
+        }
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
         }
         .container {
             max-width: 800px;
@@ -31,7 +42,7 @@
             font-weight: bold;
             display: block;
         }
-        select, input[type="text"], button {
+        select, input[type="text"], input[type="number"], button, input[type="datetime-local"] {
             width: 100%;
             padding: 10px;
             font-size: 16px;
@@ -66,7 +77,6 @@
 </head>
 <body>
     <div class="container">
-        
         <h1>Create Quiz</h1>
         <form action="/add_quiz" method="post">
             <input type="text" style="display: none;" name="email" value=<%= email %>>
@@ -78,16 +88,15 @@
                 <input type="text" id="title" name="title" required>
             </div>
    
-    <div class="form-group">
-        <label for="startTime">Start Time:</label>
-        <input type="datetime-local" id="startTime" name="startTime" required>
-    </div>
-    <div class="form-group">
-        <label for="endTime">End Time:</label>
-        <input type="datetime-local" id="endTime" name="endTime" required>
-    </div>
+            <div class="form-group">
+                <label for="startTime">Start Time:</label>
+                <input type="datetime-local" id="startTime" name="startTime" required>
+            </div>
+            <div class="form-group">
+                <label for="endTime">End Time:</label>
+                <input type="datetime-local" id="endTime" name="endTime" required>
+            </div>
             
-           
             <div class="form-group">
                 <label for="duration">Quiz Duration (in minutes):</label>
                 <input type="number" id="duration" name="duration" min="1" required>
@@ -152,4 +161,3 @@
     </script>
 </body>
 </html>
- 
