@@ -129,6 +129,29 @@
             color: #333;
             font-weight: bold;
         }
+        
+.success-message {
+    background-color: #d4edda; /* Light green */
+    color: #155724; /* Dark green text */
+    border: 1px solid #c3e6cb; /* Green border */
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+}
+
+/* Error message */
+.error-message {
+    background-color: #f8d7da; /* Light red */
+    color: #721c24; /* Dark red text */
+    border: 1px solid #f5c6cb; /* Red border */
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+}
     </style>
 </head>
 <body>
@@ -137,12 +160,26 @@
             <p>Name: <%= name %></p>
             <p>Email: <%= email %></p>
         </div>
+        <% if (success) { %>
+            <div class="success-message">
+                <%= success %>
+            </div>
+        <% } %>
+        <% if (error) { %>
+            <div class="error-message">
+                <%= error %>
+            </div>
+        <% } %>
         <form id="join-form" action="/join_group" method="post">
             <div class="join-section">
                 <input type="text" style="display: none;" name="email" value=<%= email %>>
                 <input type="text" id="course-code" name="gc" placeholder="Enter Course Code">
                 <button type="submit" id="join-button">Join</button>
             </div>
+        </form>
+        <form id="logout-form" action="/logout" method="post" style="margin-right: 20px;">
+            <input type="text" style="display: none;" name="email" value=<%= email %>>
+            <button type="submit" id="logout-button">Logout</button>
         </form>
     </header>
 
@@ -206,6 +243,28 @@
                 console.error('Form not found for quizId:', quizId);
             }
         }
+
+        document.addEventListener("DOMContentLoaded", function() {
+        function hideMessages() {
+            var successMessage = document.querySelector('.success-message');
+            var errorMessage = document.querySelector('.error-message');
+            if (successMessage) {
+                successMessage.style.opacity = 0;
+                setTimeout(function() {
+                    successMessage.style.display = "none";
+                }, 1000); // Fade out over 1 second
+            }
+            if (errorMessage) {
+                errorMessage.style.opacity = 0;
+                setTimeout(function() {
+                    errorMessage.style.display = "none";
+                }, 1000); // Fade out over 1 second
+            }
+        }
+
+        // Hide messages after 3 seconds (3000 milliseconds)
+        setTimeout(hideMessages, 3000);
+    });
     </script>
 </body>
 </html>

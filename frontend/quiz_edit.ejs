@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Quiz</title>
+    <style>
+        /* Your CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(45deg, #FFD700, #FFA500, #FF8C00);
+            background-size: 400% 400%;
+            animation: gradient 5s ease infinite;
+            margin: 0;
+            padding: 0;
+        }
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin-top: 0;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+        }
+        select, input[type="text"], input[type="number"], button, input[type="datetime-local"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin-top: 5px;
+        }
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="%23828282" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="24px" height="24px"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"></path></svg>');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 30px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #ccc;
+            margin: 20px 0;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+        }
+
+        /* Style for the button */
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <header>
+        <!-- Button to navigate to leaderboard -->
+        <form action="/leaderboard" method="post">
+            <input type="hidden" name="quizId" value="<%= quiz._id %>">
+
+            <button type="submit">Go to Leaderboard</button>
+        </form>
+
+        <!-- User info and other content of the header -->
+    </header>
+    <div class="container">
+
+        <h1>Edit Quiz</h1>
+        <form action="/update_quiz" method="post">
+            <input type="hidden" name="quizId" value="<%= quiz._id %>">
+            
+
+            <div class="form-group">
+                <label for="title">Quiz Title:</label>
+                <input type="text" id="title" name="title" value="<%= quiz.title %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="startTime">Start Time:</label>
+                <input type="datetime-local" id="startTime" name="startTime" value="<%= quiz.startDate.toISOString().slice(0,16) %>" required>
+            </div>
+            <div class="form-group">
+                <label for="endTime">End Time:</label>
+                <input type="datetime-local" id="endTime" name="endTime" value="<%= quiz.endDate.toISOString().slice(0,16) %>" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="duration">Quiz Duration (in minutes):</label>
+                <input type="number" id="duration" name="duration" min="1" value="<%= quiz.time %>" required>
+            </div>
+            <hr>
+            <h2>Edit Questions</h2>
+            <div id="questions">
+                <% quiz.questions.forEach((question, index) => { %>
+                    <div class="question">
+                        <div class="form-group">
+                            <label for="question_<%= index %>">Question:</label>
+                            <input type="text" name="question[]" value="<%= question.question %>" required>
+                        </div>
+                        <% question.options.forEach((option, optIndex) => { %>
+                            <div class="form-group">
+                                <label for="option<%= optIndex + 1 %>_<%= index %>">Option <%= optIndex + 1 %>:</label>
+                                <input type="text" name="options[]" value="<%= option %>" required>
+                            </div>
+                        <% }); %>
+                        <div class="form-group">
+                            <label for="correctOption_<%= index %>">Correct Option:</label>
+                            <select name="correctOption">
+                                <% for(let i = 0; i < question.options.length; i++) { %>
+                                    <option value="<%= i %>" <% if (i === question.correctOption) { %> selected <% } %> >Option <%= i + 1 %></option>
+                                <% } %>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="marks_<%= index %>">Marks:</label>
+                            <input type="number" name="marks[]" min="1" value="<%= question.marks %>" required>
+                        </div>
+                        <button type="button" onclick="removeQuestion(this.parentNode)">Remove Question</button>
+                        <hr>
+                    </div>
+                <% }); %>
+            </div>
+            <button type="button" onclick="addQuestion()">Add Question</button>
+            <button type="submit">Update Quiz</button>
+        </form>
+    </div>
+
+    <script>
+        // Your JavaScript code here
+    </script>
+</body>
+</html>

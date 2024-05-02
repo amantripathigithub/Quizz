@@ -101,6 +101,38 @@ header {
     border-radius: 5px;
     cursor: pointer;
 }
+.quiz-list {
+    list-style: none;
+    padding: 0;
+}
+
+.quiz-details {
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #fff;
+    transition: transform 0.3s ease;
+}
+
+.quiz-details:hover {
+    transform: translateY(-5px);
+}
+
+.quiz-details a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+}
+
+.quiz-details p {
+    margin: 0;
+}
+
+.quiz-details p span {
+    font-weight: normal;
+}
+
     </style>
 </head>
 <body>
@@ -141,10 +173,20 @@ header {
             <div class="quiz-list">
                 <% quizzes.forEach(quiz => { %>
                     <div class="quiz-details">
-                        <a href="/quizzes/<%= quiz.id %>">
-                            <p><strong>Name:</strong> <%= quiz.title %> | <strong>Start Time:</strong> <%= quiz.startDate%> | <strong>End Time:</strong> <%= quiz.endDate %> | <strong>Duration:</strong> <%= quiz.time %> minutes</p>
-                        </a>
+                        <form action="/update_quiz_show/<%= quiz._id %>" method="POST">
+                            <!-- Hidden input to store the quiz ID -->
+                            <input type="hidden" name="quizId" value="<%= quiz.id %>">
+                            <input type="text" style="display: none;" name="gc" value=<%= gc %>>
+                            <input type="text" style="display: none;" name="gn" value=<%= gn %>>
+                            <input type="text" style="display: none;" name="email" value=<%= email %>>
+                
+                            <!-- Button to submit the form -->
+                            <button type="submit" class="quiz-link">
+                                <p><strong>Name:</strong> <%= quiz.title %> | <strong>Start Time:</strong> <%= quiz.startDate%> | <strong>End Time:</strong> <%= quiz.endDate %> | <strong>Duration:</strong> <%= quiz.time %> minutes</p>
+                            </button>
+                        </form>
                     </div>
+                    
                 <% }); %>
             </div>
         </div>

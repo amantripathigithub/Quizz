@@ -12,6 +12,7 @@ const questionSchema = new Schema({
 const stuResult = new Schema({
     email: {type: String},
     score:{type:Number},
+    att:{type:Number},
 })
 
 // Define a schema for quizzes

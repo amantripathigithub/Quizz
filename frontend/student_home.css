@@ -87,3 +87,25 @@ main {
 .upcoming-quizzes p {
     margin: 0;
 }
+/* Add this CSS to student_home.css */
+#logout-form {
+    margin-right: 20px;
+}
+
+#logout-button {
+    background-color: #dc3545; /* Red color */
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#logout-button:hover {
+    background-color: #c82333; /* Darker red on hover */
+}
+
+

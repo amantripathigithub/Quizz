@@ -16,6 +16,28 @@
             flex-direction: column;
             align-items: center;
         }
+        .success-message {
+            background-color: #d4edda; /* Light green */
+            color: #155724; /* Dark green text */
+            border: 1px solid #c3e6cb; /* Green border */
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-family: Arial, sans-serif;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+        }
+
+        /* Error message */
+        .error-message {
+            background-color: #f8d7da; /* Light red */
+            color: #721c24; /* Dark red text */
+            border: 1px solid #f5c6cb; /* Red border */
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-family: Arial, sans-serif;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+        }
 
         @keyframes gradient {
             0% {
@@ -35,6 +57,19 @@
             padding: 20px;
             text-align: center;
             width: 100%;
+            position: relative; /* Required for absolute positioning */
+        }
+
+        .logout-button {
+            position: absolute;
+            top: 10px; /* Adjust top position */
+            right: 20px; /* Adjust right position */
+            background-color: #dc3545; /* Red background color */
+            color: #fff; /* White text color */
+            padding: 10px 20px; /* Padding */
+            border: none; /* No border */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Cursor style */
         }
 
         .sections-container {
@@ -61,19 +96,7 @@
 
     </style>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
-    <script type="text/javascript">
-        $(document).ready( function () {
-            $('#myform').submit( function () {
-                var formdata = $(this).serialize();
-                $.ajax({
-                    type: "POST",
-                    url: "/add_group",
-                    data: formdata
-                 });
-                return false;
-            });
-        });
-    </script>
+   
 </head>
 
 <body>
@@ -82,50 +105,57 @@
         </h1>
         <p>Email: <%= email %>
         </p>
+        <!-- Logout button -->
+        <form action="/logout" method="post" class="logout-button">
+            <button type="submit">Logout</button>
+        </form>
     </header>
 
     <div class="sections-container">
         <!-- Add Group Section -->
+        <% if (success) { %>
+            <div class="success-message">
+                <%= success %>
+            </div>
+        <% } %>
+        <% if (error) { %>
+            <div class="error-message">
+                <%= error %>
+            </div>
+        <% } %>
         <div class="section">
             <h2>Add New Group</h2>
             <form action="/faculty_view_group" method="post"> <!-- Wrap the select inside a form -->
                 <input type="text" style="display: none;" name="email" value=<%= email %>>
+                <input type="text" style="display: none;" name="name" value=<%= name %>>
                 <select name="selectedGroup" class="group-list">
                     <% gc.forEach(function(group) { %>
                         <option value="<%= group.groupCode %>">
                             <%= group.name %>
                         </option>
-                        <% }); %>
-
+                    <% }); %>
                 </select>
                 <button type="submit">Go To Group</button>
             </form>
             <form id = "myform" action="/add_group" method="post">
                 <input type="text" name="groupName" placeholder="Enter Group Name">
                 <input type="text" style="display: none;" name="email" value=<%= email %>>
-
+                <input type="text" style="display: none;" name="name" value=<%= name %>>
                 <input type="text" id="gc" name="groupCode" readonly>
                 <button type="button" onclick=generateUniqueGroupId()>Regenerate</button>
-
                 <button type="submit">Add Group</button>
             </form>
-            
         </div>
-
+        
         <!-- Quizzes Section -->
         <div class="section">
             <h2>Quizzes</h2>
             <% quizzes.forEach(function(quiz) { %>
                 <div class="quiz-container">
-                    <h3>
-                        <%= quiz.title %>
-                    </h3>
-                    <p>Start Date: <%= quiz.startDate %>
-                    </p>
-                    <p>End Date: <%= quiz.endDate %>
-                    </p>
-                    <p>Time of Quiz: <%= quiz.startTime %> - <%= quiz.time %>
-                    </p>
+                    <h3><%= quiz.title %></h3>
+                    <p>Start Date: <%= quiz.startDate %></p>
+                    <p>End Date: <%= quiz.endDate %></p>
+                    <p>Time of Quiz: <%= quiz.startTime %> - <%= quiz.time %></p>
                 </div>
                 <% if (quizzes.indexOf(quiz) !== quizzes.length - 1) { %>
                     <hr /> <!-- Add separator unless it's the last quiz -->
@@ -137,35 +167,6 @@
     <script>
         var allGroups = <%- JSON.stringify(allGroups) %>;
         console.log("group data:", allGroups);
-
-        // function submitForm() {
-        //     const form = document.getElementById('myForm');
-        //     console.log(form)
-        //     const formData = new FormData(form);
-
-        //     const obj = {};
-
-        //     for(let ob of formData){
-        //         obj[ob[0]] = ob[1];
-        //     }
-
-        //     console.log(obj)
-
-        //     fetch('/add_group', {
-        //         method: 'POST',
-        //         body: obj
-        //     })
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         console.log('Success:', data);
-        //         // Handle success response
-        //     })
-        //     .catch((error) => {
-        //         console.error('Error:', error);
-        //         // Handle error
-        //     });
-        // }
-
 
         function generateUniqueId() {
             const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -180,20 +181,23 @@
             return id;
         }
 
-
         function generateUniqueGroupId() {
             let uniqueId;
 
             do {
                 uniqueId = generateUniqueId();
-
             } while (allGroups.includes(uniqueId));
 
             document.getElementById("gc").value = uniqueId;
-
-            console.log(uniqueId)
+            console.log(uniqueId);
         }
-    </script>
 
+        function hideMessages() {
+            $('.success-message, .error-message').fadeOut(1000); // Fade out over 1 second
+        }
+
+        // Hide messages after 3 seconds (3000 milliseconds)
+        setTimeout(hideMessages, 3000);
+    </script>
 </body>
 </html>
