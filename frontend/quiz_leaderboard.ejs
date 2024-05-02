@@ -53,12 +53,26 @@
         .highlight {
             background-color: yellow; /* Change this to your desired highlight color */
         }
+        button {
+            display: block;
+            margin: 0 auto;
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0b7dda;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Leaderboard</h1>
-        <table>
+        <table id="leaderboardTable">
             <thead>
                 <tr>
                     <th>Rank</th>
@@ -78,6 +92,34 @@
                 <% }); %>
             </tbody>
         </table>
+        <button id="downloadExcelBtn" onclick="clicked()">Download Excel</button>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script>
+        // Function to convert JSON data to Excel format and start download automatically
+        function downloadExcel(data) {
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(data);
+            XLSX.utils.book_append_sheet(wb, ws, "Leaderboard");
+            const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([wbout], { type: 'application/octet-stream' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'leaderboard.xlsx';
+            a.click();
+            setTimeout(() => { URL.revokeObjectURL(url); }, 1000);
+        }
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const downloadExcelBtn = document.getElementById('downloadExcelBtn');
+            downloadExcelBtn.addEventListener('click', function() {
+                const leaderboardData = <%- JSON.stringify(sr) %>;
+                downloadExcel(leaderboardData);
+            });
+        });
+    </script>
 </body>
 </html>
