@@ -8,23 +8,11 @@
         /* Your CSS styles here */
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(45deg, #FFD700, #FFA500, #FF8C00);
-            background-size: 400% 400%;
-            animation: gradient 5s ease infinite;
+            background-color: white;
             margin: 0;
             padding: 0;
         }
-        @keyframes gradient {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
-        }
+        
         .container {
             max-width: 800px;
             margin: 50px auto;
@@ -101,29 +89,22 @@
 
 <body>
 
-
     <header>
         <!-- Button to navigate to leaderboard -->
         <form action="/leaderboard" method="post">
             <input type="hidden" name="quizId" value="<%= quiz._id %>">
-
             <button type="submit">Go to Leaderboard</button>
         </form>
-
         <!-- User info and other content of the header -->
     </header>
     <div class="container">
-
         <h1>Edit Quiz</h1>
         <form action="/update_quiz" method="post">
             <input type="hidden" name="quizId" value="<%= quiz._id %>">
-            
-
             <div class="form-group">
                 <label for="title">Quiz Title:</label>
                 <input type="text" id="title" name="title" value="<%= quiz.title %>" required>
             </div>
-
             <div class="form-group">
                 <label for="startTime">Start Time:</label>
                 <input type="datetime-local" id="startTime" name="startTime" value="<%= quiz.startDate.toISOString().slice(0,16) %>" required>
@@ -132,7 +113,6 @@
                 <label for="endTime">End Time:</label>
                 <input type="datetime-local" id="endTime" name="endTime" value="<%= quiz.endDate.toISOString().slice(0,16) %>" required>
             </div>
-            
             <div class="form-group">
                 <label for="duration">Quiz Duration (in minutes):</label>
                 <input type="number" id="duration" name="duration" min="1" value="<%= quiz.time %>" required>

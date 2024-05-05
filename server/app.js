@@ -1300,7 +1300,7 @@ app.post('/quiz_submit', async (req, res) => {
 
 
         // quiz.result.push({ email, score: mark });
-        // await quiz.save();
+         await quiz.save();
 
         const userExist = await Student.findOne({ email });
         if (userExist) {

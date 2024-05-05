@@ -7,132 +7,125 @@
     <link rel="stylesheet" href="sectionDetails_CSS.css">
     <style>
         body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(45deg, #FFD700, #FFA500, #FF8C00);
-    background-size: 400% 400%;
-    animation: gradient 5s ease infinite;
-    margin: 0;
-    padding: 0;
-}
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2; /* Changed to a solid light gray color */
+            margin: 0;
+            padding: 0;
+        }
 
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    background-color: #333;
-    color: #fff;
-}
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+        }
 
-.user-info {
-    display: flex;
-    align-items: center;
-}
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
 
-.user-info h2 {
-    margin-right: 20px;
-}
+        .user-info h2 {
+            margin-right: 20px;
+        }
 
-.group-section {
-    width: 40%;
-    margin-right: 20px;
-    background-color: #f2f2f2;
-    padding: 20px;
-    border-radius: 10px;
-    overflow-y: auto;
-}
+        .group-section {
+            width: 40%;
+            margin-right: 20px;
+            background-color: #f2f2f2;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-y: auto;
+        }
 
-.group-section h2 {
-    margin-bottom: 10px;
-}
+        .group-section h2 {
+            margin-bottom: 10px;
+        }
 
-.group-list {
-    list-style: none;
-    padding: 0;
-}
+        .group-list {
+            list-style: none;
+            padding: 0;
+        }
 
-.group-list li {
-    margin-bottom: 10px;
-}
+        .group-list li {
+            margin-bottom: 10px;
+        }
 
-.group-list a {
-    text-decoration: none;
-    color: #333;
-    font-weight: bold;
-}
+        .group-list a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
 
-.upcoming-quizzes {
-    width: 60%;
-    background-color: #f2f2f2;
-    padding: 20px;
-    border-radius: 10px;
-    overflow-y: auto;
-}
+        .upcoming-quizzes {
+            width: 60%;
+            background-color: #f2f2f2;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-y: auto;
+        }
 
-.upcoming-quizzes h2 {
-    margin-bottom: 10px;
-}
+        .upcoming-quizzes h2 {
+            margin-bottom: 10px;
+        }
 
-.quiz-list {
-    list-style: none;
-    padding: 0;
-}
+        .quiz-list {
+            list-style: none;
+            padding: 0;
+        }
 
-.quiz-list .quiz-details {
-    margin-bottom: 10px;
-}
+        .quiz-list .quiz-details {
+            margin-bottom: 10px;
+        }
 
-.quiz-list a {
-    text-decoration: none;
-    color: #333;
-    font-weight: bold;
-}
+        .quiz-list a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
 
-.quiz-details p {
-    margin: 0;
-    font-size: 12px;
-}
+        .quiz-details p {
+            margin: 0;
+            font-size: 12px;
+        }
 
-.add-quiz-button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-.quiz-list {
-    list-style: none;
-    padding: 0;
-}
+        .add-quiz-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-.quiz-details {
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    background-color: #fff;
-    transition: transform 0.3s ease;
-}
+        .quiz-details {
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #fff;
+            transition: transform 0.3s ease;
+        }
 
-.quiz-details:hover {
-    transform: translateY(-5px);
-}
+        .quiz-details:hover {
+            transform: translateY(-5px);
+        }
 
-.quiz-details a {
-    text-decoration: none;
-    color: #333;
-    font-weight: bold;
-}
+        .quiz-details a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
 
-.quiz-details p {
-    margin: 0;
-}
+        .quiz-details p {
+            margin: 0;
+        }
 
-.quiz-details p span {
-    font-weight: normal;
-}
-
+        .quiz-details p span {
+            font-weight: normal;
+        }
     </style>
 </head>
 <body>

@@ -7,22 +7,9 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(45deg, #FFD700, #FFA500, #FF8C00, #FF6347, #FF4500);
-            background-size: 400% 400%;
-            animation: gradient 5s ease infinite;
+            background-color: #f9f9f9;
             margin: 0;
             padding: 0;
-        }
-        @keyframes gradient {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
         }
         .container {
             max-width: 800px;
@@ -129,23 +116,19 @@
             updateTimer();
 
             function updateTimer() {
-    const timeLeft = startTime - new Date().getTime();
-
-    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-    countdownElement.innerHTML = `Time left to start: ${days}d ${hours}h ${minutes}m ${seconds}s`;
-
-    if (timeLeft <= 0) {
-        countdownElement.innerHTML = "Quiz is starting...";
-        document.getElementById("startButton").removeAttribute("disabled");
-    } else {
-        setTimeout(updateTimer, 1000); // Call updateTimer every second
-    }
-}
-
+                const timeLeft = startTime - new Date().getTime();
+                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                countdownElement.innerHTML = `Time left to start: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+                if (timeLeft <= 0) {
+                    countdownElement.innerHTML = "Quiz is starting...";
+                    document.getElementById("startButton").removeAttribute("disabled");
+                } else {
+                    setTimeout(updateTimer, 1000); // Call updateTimer every second
+                }
+            }
         }
     </script>
 </body>
