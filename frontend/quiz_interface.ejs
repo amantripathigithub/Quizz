@@ -106,29 +106,18 @@
 
     <script>
         // Get the start and end time from the server-side rendering
-        const startTime = new Date("<%= quiz.startDate %>").getTime();
-        const endTime = new Date("<%= quiz.endDate %>").getTime();
-        const currentTime = new Date().getTime();
+        const startTimeBackend = new Date("<%= quiz.startDate %>"); // Start time from backend
+        const endTimeBackend = new Date("<%= quiz.endDate %>");     // End time from backend
 
+        // Get the current time on the client side
+        const currentTime = new Date();
 
-        const now = new Date();
-            const hours = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const seconds = now.getSeconds().toString().padStart(2, '0');
-            const currentTimeString = `${hours}:${minutes}:${seconds}`;
+        // Get the client's timezone offset in milliseconds and convert it to hours
+        const timezoneOffsetHours = currentTime.getTimezoneOffset() / 60;
 
-            console.log(currentTimeString);
-
-            const st = new Date("<%= quiz.startDate %>");
-
-            const hours1 = st.getHours().toString().padStart(2, '0');
-            const minutes1 = st.getMinutes().toString().padStart(2, '0');
-            const seconds1 = st.getSeconds().toString().padStart(2, '0');
-            const currentTimeString1 = `${hours1}:${minutes1}:${seconds1}`;
-
-            console.log(currentTimeString1);
-
-            
+        // Adjust the start and end times according to the client's timezone offset
+        const startTime = startTimeBackend.getTime() - (timezoneOffsetHours * 60 * 60 * 1000);
+        const endTime = endTimeBackend.getTime() - (timezoneOffsetHours * 60 * 60 * 1000);
 
         // If current time is less than start time, show dynamic timer
         if (currentTime < startTime) {
@@ -136,7 +125,7 @@
             updateTimer();
 
             function updateTimer() {
-                const timeLeft = startTime - new Date().getTime();
+                const timeLeft = startTime - currentTime.getTime();
                 const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
