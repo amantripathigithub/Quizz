@@ -109,8 +109,9 @@
         const startTime = new Date("<%= quiz.startDate %>").getTime();
         const endTime = new Date("<%= quiz.endDate %>").getTime();
         const currentTime = new Date().getTime();
+const tt = new Date();
 
-console.log(currentTime);
+console.log(tt.getDate,tt.getHours,tt.getMinutes);
 console.log("uper curr and niche start");
 console.log(startTime);
 
