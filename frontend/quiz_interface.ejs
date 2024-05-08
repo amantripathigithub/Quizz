@@ -92,13 +92,10 @@
 
                 <input type="hidden" name="quizId" value="<%= quiz._id %>">
                 <input type="text" style="display: none;" name="email" value=<%= email %>>
-                <% if (currentTime < startTime) { %>
-                    <p id="countdown"></p>
-                <% } else if (currentTime >= startTime && currentTime < endTime) { %>
-                    <button class="start-button" id="startButton" type="submit">Start Quiz</button>
-                <% } else { %>
-                    <p class="quiz-over">Quiz is Over</p>
-                <% } %>
+                <!-- Display the countdown, start button, or quiz over message based on current time -->
+                <p id="countdown"></p>
+                <button class="start-button" id="startButton" style="display: none;" type="submit">Start Quiz</button>
+                <p class="quiz-over" id="quizOver" style="display: none;">Quiz is Over</p>
             </form>
             <p class="note-points">Do not switch tabs or close the window, as it will result in auto submission of your quiz without warning.</p>
         </div>
@@ -114,9 +111,16 @@
         const startTime = startTimeBackend.getTime() - (5 * 60 * 60 * 1000) - (30 * 60 * 1000);
         const endTime = endTimeBackend.getTime() - (5 * 60 * 60 * 1000) - (30 * 60 * 1000);
 
-        // If current time is less than start time, show dynamic timer
+        // Update the timer continuously until the quiz starts
         if (currentTime < startTime) {
             const countdownElement = document.getElementById("countdown");
+            const startButton = document.getElementById("startButton");
+            const quizOver = document.getElementById("quizOver");
+
+            countdownElement.style.display = "block";
+            startButton.style.display = "none";
+            quizOver.style.display = "none";
+
             updateTimer();
 
             function updateTimer() {
@@ -127,12 +131,22 @@
                 const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
                 countdownElement.innerHTML = `Time left to start: ${days}d ${hours}h ${minutes}m ${seconds}s`;
                 if (timeLeft <= 0) {
-                    countdownElement.innerHTML = "Quiz is starting...";
+                    countdownElement.style.display = "none";
+                    startButton.style.display = "block";
+                    quizOver.style.display = "none";
                     document.getElementById("startButton").removeAttribute("disabled");
                 } else {
                     setTimeout(updateTimer, 1000); // Call updateTimer every second
                 }
             }
+        } else if (currentTime >= startTime && currentTime < endTime) {
+            document.getElementById("countdown").style.display = "none";
+            document.getElementById("startButton").style.display = "block";
+            document.getElementById("quizOver").style.display = "none";
+        } else {
+            document.getElementById("countdown").style.display = "none";
+            document.getElementById("startButton").style.display = "none";
+            document.getElementById("quizOver").style.display = "block";
         }
     </script>
 </body>
