@@ -109,12 +109,13 @@
         const startTime = new Date("<%= quiz.startDate %>").getTime();
         const endTime = new Date("<%= quiz.endDate %>").getTime();
         const currentTime = new Date().getTime();
-const tt = new Date();
+        const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            const currentTimeString = `${hours}:${minutes}:${seconds}`;
 
-console.log(tt.getDate,tt.getHours,tt.getMinutes);
-console.log("uper curr and niche start"+tt.getTimezoneOffset);
-
-console.log(startTime);
+            console.log(currentTimeString);
 
         // If current time is less than start time, show dynamic timer
         if (currentTime < startTime) {
