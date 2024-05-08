@@ -110,6 +110,10 @@
         const endTime = new Date("<%= quiz.endDate %>").getTime();
         const currentTime = new Date().getTime();
 
+console.log(currentTime);
+console.log("uper curr and niche start");
+console.log(startTime);
+
         // If current time is less than start time, show dynamic timer
         if (currentTime < startTime) {
             const countdownElement = document.getElementById("countdown");
